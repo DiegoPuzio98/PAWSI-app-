@@ -1,12 +1,78 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Navigation } from "@/components/navigation";
+import { NewsStrip } from "@/components/news-strip";
+import { Camera, AlertTriangle, Heart, ShoppingCart } from "lucide-react";
+import { PawIcon } from "@/components/ui/paw-icon";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main className="container mx-auto px-4 py-6">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <PawIcon size={64} />
+          </div>
+          <h1 className="text-3xl font-bold text-primary mb-2">Welcome to Pawsi</h1>
+          <p className="text-muted-foreground">Help reunite pets with their families</p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <Card className="p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-full">
+                <Camera className="h-8 w-8 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">Animal Sighted</h3>
+                <p className="text-sm text-muted-foreground mb-3">Report a pet you've seen</p>
+                <Link to="/reported/new">
+                  <Button className="w-full">Report Sighting</Button>
+                </Link>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-destructive/10 rounded-full">
+                <AlertTriangle className="h-8 w-8 text-destructive" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold mb-1">Lost Pet</h3>
+                <p className="text-sm text-muted-foreground mb-3">Post a missing pet alert</p>
+                <Link to="/lost/new">
+                  <Button variant="destructive" className="w-full">Post Alert</Button>
+                </Link>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Quick Access Buttons */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Link to="/adoptions">
+            <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+              <Heart className="h-5 w-5" />
+              <span className="text-sm">Adoptions</span>
+            </Button>
+          </Link>
+          <Link to="/marketplace">
+            <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+              <ShoppingCart className="h-5 w-5" />
+              <span className="text-sm">Buy & Sell</span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* News Strip */}
+        <NewsStrip />
+      </main>
     </div>
   );
 };
