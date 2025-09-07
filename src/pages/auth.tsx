@@ -8,6 +8,7 @@ import { PawIcon } from "@/components/ui/paw-icon";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +34,12 @@ const AuthPage = () => {
       if (error) throw error;
 
       toast({
-        title: "Check your email",
-        description: "We've sent you a confirmation link to complete your registration.",
+        title: t('auth.checkEmail'),
+        description: t('auth.confirmationSent'),
       });
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('auth.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -59,13 +61,13 @@ const AuthPage = () => {
       if (error) throw error;
 
       toast({
-        title: "Welcome back!",
-        description: "You've been successfully signed in.",
+        title: t('auth.welcomeBack'),
+        description: t('auth.signedInSuccess'),
       });
       navigate("/");
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: t('auth.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -81,20 +83,20 @@ const AuthPage = () => {
           <div className="flex justify-center mb-4">
             <PawIcon size={48} />
           </div>
-          <CardTitle className="text-2xl">Welcome to Pawsi</CardTitle>
-          <CardDescription>Sign in to help reunite pets with their families</CardDescription>
+          <CardTitle className="text-2xl">{t('auth.welcome')}</CardTitle>
+          <CardDescription>{t('auth.subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -104,7 +106,7 @@ const AuthPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.password')}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -114,7 +116,7 @@ const AuthPage = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading ? t('auth.signingIn') : t('auth.signIn')}
                 </Button>
               </form>
             </TabsContent>
@@ -122,7 +124,7 @@ const AuthPage = () => {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -132,7 +134,7 @@ const AuthPage = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -143,7 +145,7 @@ const AuthPage = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Sign Up"}
+                  {loading ? t('auth.creatingAccount') : t('auth.signUp')}
                 </Button>
               </form>
             </TabsContent>

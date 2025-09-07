@@ -5,8 +5,12 @@ import { NewsStrip } from "@/components/news-strip";
 import { Camera, AlertTriangle, Heart, ShoppingCart } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -17,8 +21,8 @@ const Index = () => {
           <div className="flex justify-center mb-4">
             <PawIcon size={64} />
           </div>
-          <h1 className="text-3xl font-bold text-primary mb-2">Welcome to Pawsi</h1>
-          <p className="text-muted-foreground">Help reunite pets with their families</p>
+          <h1 className="text-3xl font-bold text-primary mb-2">{t('home.welcome')}</h1>
+          <p className="text-muted-foreground">{t('home.subtitle')}</p>
         </div>
 
         {/* Quick Actions */}
@@ -29,10 +33,10 @@ const Index = () => {
                 <Camera className="h-8 w-8 text-primary" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold mb-1">Animal Sighted</h3>
-                <p className="text-sm text-muted-foreground mb-3">Report a pet you've seen</p>
+                <h3 className="font-semibold mb-1">{t('home.animalSighted')}</h3>
+                <p className="text-sm text-muted-foreground mb-3">{t('home.animalSightedDesc')}</p>
                 <Link to="/reported/new">
-                  <Button className="w-full">Report Sighting</Button>
+                  <Button className="w-full">{t('home.reportSighting')}</Button>
                 </Link>
               </div>
             </div>
@@ -44,10 +48,10 @@ const Index = () => {
                 <AlertTriangle className="h-8 w-8 text-destructive" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold mb-1">Lost Pet</h3>
-                <p className="text-sm text-muted-foreground mb-3">Post a missing pet alert</p>
+                <h3 className="font-semibold mb-1">{t('home.lostPet')}</h3>
+                <p className="text-sm text-muted-foreground mb-3">{t('home.lostPetDesc')}</p>
                 <Link to="/lost/new">
-                  <Button variant="destructive" className="w-full">Post Alert</Button>
+                  <Button variant="destructive" className="w-full">{t('home.postAlert')}</Button>
                 </Link>
               </div>
             </div>
@@ -59,13 +63,13 @@ const Index = () => {
           <Link to="/adoptions">
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
               <Heart className="h-5 w-5" />
-              <span className="text-sm">Adoptions</span>
+              <span className="text-sm">{t('home.adoptions')}</span>
             </Button>
           </Link>
           <Link to="/marketplace">
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
               <ShoppingCart className="h-5 w-5" />
-              <span className="text-sm">Buy & Sell</span>
+              <span className="text-sm">{t('home.buySell')}</span>
             </Button>
           </Link>
         </div>

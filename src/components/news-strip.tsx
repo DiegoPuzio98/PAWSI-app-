@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Post {
   id: string;
@@ -14,6 +15,7 @@ interface Post {
 }
 
 export const NewsStrip = () => {
+  const { t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +58,7 @@ export const NewsStrip = () => {
   if (loading) {
     return (
       <div className="w-full py-4">
-        <h2 className="text-lg font-semibold mb-3 text-primary">Latest News</h2>
+        <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
         <div className="flex gap-3 overflow-x-auto pb-2">
           {[1, 2, 3].map((i) => (
             <div key={i} className="min-w-[280px] h-24 bg-muted animate-pulse rounded-lg" />
@@ -68,13 +70,13 @@ export const NewsStrip = () => {
 
   return (
     <div className="w-full py-4">
-      <h2 className="text-lg font-semibold mb-3 text-primary">Latest News</h2>
+      <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
       <div className="flex gap-3 overflow-x-auto pb-2">
         {posts.map((post) => (
           <Card key={post.id} className="min-w-[280px] p-3 bg-card hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between mb-2">
               <Badge variant={post.type === 'lost' ? 'destructive' : 'default'}>
-                {post.type === 'lost' ? 'Lost' : 'Reported'}
+                {post.type === 'lost' ? t('status.lost') : t('status.reported')}
               </Badge>
               {post.species && (
                 <Badge variant="outline">{post.species}</Badge>
