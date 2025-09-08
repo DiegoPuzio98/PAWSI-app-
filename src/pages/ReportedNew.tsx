@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Navigation } from "@/components/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
@@ -19,6 +20,7 @@ const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
 export default function ReportedNew() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [species, setSpecies] = useState<string>("");
@@ -79,6 +81,7 @@ export default function ReportedNew() {
         state,
         owner_secret_hash,
         status: "active",
+        user_id: user?.id,
       });
 
       if (error) throw error;

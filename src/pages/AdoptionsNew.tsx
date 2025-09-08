@@ -9,8 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
+import { LocationPicker } from "@/components/LocationPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
 const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
@@ -18,6 +20,7 @@ const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
 export default function AdoptionsNew() {
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [species, setSpecies] = useState<string>("");
@@ -25,6 +28,8 @@ export default function AdoptionsNew() {
   const [age, setAge] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
@@ -68,12 +73,15 @@ export default function AdoptionsNew() {
         age: age || null,
         description: description || null,
         location_text: location || null,
+        location_lat: locationLat,
+        location_lng: locationLng,
         images,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
         contact_email: email || null,
         owner_secret_hash,
         status: "active",
+        user_id: user?.id,
       });
 
       if (error) throw error;

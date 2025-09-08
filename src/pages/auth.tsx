@@ -1,159 +1,203 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PawIcon } from "@/components/ui/paw-icon";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Navigation } from "@/components/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/components/ui/use-toast";
+import { PawIcon } from "@/components/ui/paw-icon";
+import { Mail, Lock, User, AlertCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const AuthPage = () => {
+export default function AuthPage() {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+
+  const { signIn, signUp } = useAuth();
   const { t } = useLanguage();
+  const { toast } = useToast();
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
+      if (isSignUp) {
+        const { error } = await signUp(email, password, displayName);
+        if (error) {
+          if (error.message.includes('already registered')) {
+            setError('Este email ya está registrado. Intenta iniciar sesión.');
+          } else {
+            setError(error.message);
+          }
+        } else {
+          toast({ 
+            title: t('auth.checkEmail'), 
+            description: t('auth.confirmationSent') 
+          });
         }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: t('auth.checkEmail'),
-        description: t('auth.confirmationSent'),
-      });
-    } catch (error: any) {
-      toast({
-        title: t('auth.error'),
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: t('auth.welcomeBack'),
-        description: t('auth.signedInSuccess'),
-      });
-      navigate("/");
-    } catch (error: any) {
-      toast({
-        title: t('auth.error'),
-        description: error.message,
-        variant: "destructive",
-      });
+      } else {
+        const { error } = await signIn(email, password);
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            setError('Email o contraseña incorrectos. Verifica tus datos.');
+          } else {
+            setError(error.message);
+          }
+        } else {
+          toast({ 
+            title: t('auth.welcomeBack'), 
+            description: t('auth.signedInSuccess') 
+          });
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Ocurrió un error inesperado');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <PawIcon size={48} />
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-md mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <PawIcon size={48} />
+            </div>
+            <h1 className="text-2xl font-bold text-primary mb-2">
+              {isSignUp ? t('auth.signUp') : t('auth.signIn')}
+            </h1>
+            <p className="text-muted-foreground">
+              {isSignUp ? 'Crea tu cuenta para gestionar tus publicaciones' : t('auth.subtitle')}
+            </p>
           </div>
-          <CardTitle className="text-2xl">{t('auth.welcome')}</CardTitle>
-          <CardDescription>{t('auth.subtitle')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
-              <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">{t('auth.email')}</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <Alert className="mb-4 border-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-destructive">
+                    {error}
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {isSignUp && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Nombre para mostrar
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        type="text"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        placeholder="Tu nombre"
+                        className="pl-10"
+                        required={isSignUp}
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('auth.email')}
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="tu@email.com"
+                      className="pl-10"
+                      required
+                      disabled={loading}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">{t('auth.password')}</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    {t('auth.password')}
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                    <Input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="pl-10"
+                      required
+                      disabled={loading}
+                      minLength={6}
+                    />
+                  </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? t('auth.signingIn') : t('auth.signIn')}
+
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading}
+                >
+                  {loading 
+                    ? (isSignUp ? t('auth.creatingAccount') : t('auth.signingIn'))
+                    : (isSignUp ? t('auth.signUp') : t('auth.signIn'))
+                  }
                 </Button>
               </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? t('auth.creatingAccount') : t('auth.signUp')}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+
+              <div className="mt-6 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
+                  {' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp);
+                      setError(null);
+                    }}
+                    className="text-primary hover:underline font-medium"
+                    disabled={loading}
+                  >
+                    {isSignUp ? 'Iniciar sesión' : 'Crear cuenta'}
+                  </button>
+                </p>
+              </div>
+
+              <div className="mt-4 text-center">
+                <Link to="/">
+                  <Button variant="ghost" size="sm" disabled={loading}>
+                    Volver al inicio
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default AuthPage;
+}

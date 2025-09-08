@@ -33,6 +33,7 @@ export type Database = {
           status: string
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           age?: string | null
@@ -52,6 +53,7 @@ export type Database = {
           status?: string
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           age?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -91,6 +94,7 @@ export type Database = {
           status: string
           store_contact: string | null
           title: string
+          user_id: string | null
         }
         Insert: {
           category: string
@@ -108,6 +112,7 @@ export type Database = {
           status?: string
           store_contact?: string | null
           title: string
+          user_id?: string | null
         }
         Update: {
           category?: string
@@ -125,6 +130,7 @@ export type Database = {
           status?: string
           store_contact?: string | null
           title?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -147,6 +153,7 @@ export type Database = {
           species: string | null
           status: string
           title: string
+          user_id: string | null
         }
         Insert: {
           breed?: string | null
@@ -166,6 +173,7 @@ export type Database = {
           species?: string | null
           status?: string
           title: string
+          user_id?: string | null
         }
         Update: {
           breed?: string | null
@@ -185,6 +193,31 @@ export type Database = {
           species?: string | null
           status?: string
           title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -208,6 +241,7 @@ export type Database = {
           state: string
           status: string
           title: string
+          user_id: string | null
         }
         Insert: {
           breed?: string | null
@@ -228,6 +262,7 @@ export type Database = {
           state: string
           status?: string
           title: string
+          user_id?: string | null
         }
         Update: {
           breed?: string | null
@@ -248,6 +283,7 @@ export type Database = {
           state?: string
           status?: string
           title?: string
+          user_id?: string | null
         }
         Relationships: []
       }

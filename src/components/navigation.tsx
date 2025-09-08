@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Phone, LogOut } from "lucide-react";
+import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Phone, LogOut, User, Settings } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -23,6 +23,11 @@ export const Navigation = () => {
     { icon: ShoppingCart, label: t('nav.marketplace'), path: "/marketplace" },
     { icon: Heart, label: t('nav.adoptions'), path: "/adoptions" },
     { icon: Phone, label: t('nav.support'), path: "/support" },
+  ];
+
+  const authMenuItems = [
+    { icon: User, label: "Dashboard", path: "/dashboard" },
+    { icon: Settings, label: "Perfil", path: "/profile" },
   ];
 
   return (
@@ -74,6 +79,31 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
+              
+              {isAuthenticated && (
+                <>
+                  <hr className="my-2" />
+                  {authMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-accent"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </>
+              )}
             </div>
           </SheetContent>
           </Sheet>

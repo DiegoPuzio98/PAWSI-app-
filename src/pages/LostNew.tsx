@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
 const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
@@ -18,6 +19,7 @@ const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
 export default function LostNew() {
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [species, setSpecies] = useState<string>("");
@@ -25,6 +27,8 @@ export default function LostNew() {
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [lostAt, setLostAt] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
@@ -67,6 +71,8 @@ export default function LostNew() {
         breed: breed || null,
         description: description || null,
         location_text: location,
+        location_lat: locationLat,
+        location_lng: locationLng,
         images,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
@@ -74,6 +80,7 @@ export default function LostNew() {
         lost_at: lostAt ? new Date(lostAt).toISOString() : null,
         owner_secret_hash,
         status: "active",
+        user_id: user?.id,
       });
 
       if (error) throw error;

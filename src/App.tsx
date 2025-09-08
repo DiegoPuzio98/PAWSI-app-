@@ -4,9 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/hooks/useAuth";
 import { AuthGuard } from "@/components/AuthGuard";
 import Index from "./pages/Index";
 import AuthPage from "./pages/auth";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import ReportedPets from "./pages/ReportedPets";
 import LostPets from "./pages/LostPets";
 import Marketplace from "./pages/Marketplace";
@@ -22,29 +25,33 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
-            <Route path="/reported" element={<ReportedPets />} />
-            <Route path="/reported/new" element={<ReportedNew />} />
-            <Route path="/lost" element={<LostPets />} />
-            <Route path="/lost/new" element={<LostNew />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/marketplace/new" element={<MarketplaceNew />} />
-            <Route path="/adoptions" element={<Adoptions />} />
-            <Route path="/adoptions/new" element={<AdoptionsNew />} />
-            <Route path="/support" element={<Support />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
+              <Route path="/dashboard" element={<AuthGuard requireAuth={true}><Dashboard /></AuthGuard>} />
+              <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
+              <Route path="/reported" element={<ReportedPets />} />
+              <Route path="/reported/new" element={<AuthGuard requireAuth={true}><ReportedNew /></AuthGuard>} />
+              <Route path="/lost" element={<LostPets />} />
+              <Route path="/lost/new" element={<AuthGuard requireAuth={true}><LostNew /></AuthGuard>} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/marketplace/new" element={<AuthGuard requireAuth={true}><MarketplaceNew /></AuthGuard>} />
+              <Route path="/adoptions" element={<Adoptions />} />
+              <Route path="/adoptions/new" element={<AuthGuard requireAuth={true}><AdoptionsNew /></AuthGuard>} />
+              <Route path="/support" element={<Support />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </LanguageProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
