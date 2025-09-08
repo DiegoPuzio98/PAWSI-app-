@@ -96,6 +96,11 @@ export default function ReportedNew() {
       }
 
       const normalizedSpecies = normalizeSpecies(species);
+      if (!normalizedSpecies) {
+        toast({ title: "Selecciona una especie", description: "Debes elegir una especie válida." });
+        setSubmitting(false);
+        return;
+      }
       if (normalizedSpecies === 'fish') {
         toast({ title: "Especie no permitida", description: "Peces no están permitidos en esta sección." });
         setSubmitting(false);
@@ -104,7 +109,7 @@ export default function ReportedNew() {
 
       const { error } = await supabase.from("reported_posts").insert({
         title,
-        species: normalizedSpecies,
+        species: normalizedSpecies === 'dog' ? 'canes' : normalizedSpecies === 'cat' ? 'felinos' : normalizedSpecies === 'bird' ? 'aves' : 'roedores',
         breed: breed || null,
         colors,
         description: description || null,
