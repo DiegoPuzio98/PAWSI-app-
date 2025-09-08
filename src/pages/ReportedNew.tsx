@@ -109,7 +109,7 @@ export default function ReportedNew() {
 
       const { error } = await supabase.from("reported_posts").insert({
         title,
-        species: normalizedSpecies === 'dog' ? 'canes' : normalizedSpecies === 'cat' ? 'felinos' : normalizedSpecies === 'bird' ? 'aves' : 'roedores',
+        species: normalizedSpecies === 'dog' ? 'perros' : normalizedSpecies === 'cat' ? 'gatos' : normalizedSpecies === 'bird' ? 'aves' : 'roedores',
         breed: breed || null,
         colors,
         description: description || null,

@@ -82,7 +82,15 @@ export default function ReportedPets() {
     }
 
     if (speciesFilter && speciesFilter !== 'all') {
-      query = query.eq('species', speciesFilter);
+      const map: Record<string, string[]> = {
+        dogs: ['dog', 'dogs', 'perro', 'perros', 'canes'],
+        cats: ['cat', 'cats', 'gato', 'gatos', 'felinos'],
+        birds: ['bird', 'birds', 'ave', 'aves'],
+        rodents: ['rodent', 'rodents', 'roedor', 'roedores'],
+        fish: ['fish', 'pez', 'peces'],
+      };
+      const values = map[speciesFilter] ?? [speciesFilter];
+      query = query.in('species', values);
     }
 
     if (locationFilter) {
