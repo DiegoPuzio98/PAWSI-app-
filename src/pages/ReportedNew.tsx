@@ -11,7 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
-import { LocationPicker } from "@/components/LocationPicker";
+import { MapboxPicker } from "@/components/MapboxPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import bcrypt from "bcryptjs";
 
@@ -162,7 +162,7 @@ export default function ReportedNew() {
               <p className="text-xs text-muted-foreground mb-2">
                 Permite que otros usuarios vean la ubicación aproximada en un mapa
               </p>
-              <LocationPicker
+              <MapboxPicker
                 onLocationChange={(lat, lng) => {
                   setLocationLat(lat);
                   setLocationLng(lng);

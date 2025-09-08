@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
-import { LocationPicker } from "@/components/LocationPicker";
+import { MapboxPicker } from "@/components/MapboxPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -150,7 +150,7 @@ export default function AdoptionsNew() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
-              <LocationPicker
+              <MapboxPicker
                 onLocationChange={(lat, lng) => {
                   setLocationLat(lat);
                   setLocationLng(lng);

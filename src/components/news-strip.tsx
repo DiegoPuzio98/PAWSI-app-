@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
@@ -17,6 +18,7 @@ interface Post {
 
 export const NewsStrip = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,17 +27,15 @@ export const NewsStrip = () => {
       try {
         // Fetch latest lost posts
         const { data: lostPosts } = await supabase
-          .from('lost_posts')
+          .from('lost_posts_public')
           .select('id, title, location_text, created_at, species, images')
-          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(3);
 
         // Fetch latest reported posts
         const { data: reportedPosts } = await supabase
-          .from('reported_posts')
+          .from('reported_posts_public')
           .select('id, title, location_text, created_at, species, images')
-          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(3);
 
@@ -74,11 +74,18 @@ export const NewsStrip = () => {
       <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
       <div className="flex gap-3 overflow-x-auto pb-2">
         {posts.map((post) => (
-          <Card key={post.id} className="min-w-[280px] bg-card hover:shadow-md transition-shadow overflow-hidden">
+          <Card 
+            key={post.id} 
+            className="min-w-[280px] bg-card hover:shadow-md transition-shadow overflow-hidden cursor-pointer"
+            onClick={() => navigate(`/${post.type}/${post.id}`)}
+          >
             {post.images && post.images.length > 0 && (
               <div className="relative h-32 w-full overflow-hidden">
                 <img 
-                  src={`https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`}
+                  src={post.images[0].startsWith('http') 
+                    ? post.images[0] 
+                    : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
+                  }
                   alt={post.title}
                   className="w-full h-full object-cover"
                   onError={(e) => {

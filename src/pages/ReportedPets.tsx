@@ -7,9 +7,7 @@ import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, MapPin, Calendar, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { MapPreview } from "@/components/MapPreview";
+import { Link, useNavigate } from "react-router-dom";
 
 interface ReportedPost {
   id: string;
@@ -41,12 +39,11 @@ const speciesKeyForI18n = (s?: string | null) => {
 
 export default function ReportedPets() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState<ReportedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [speciesFilter, setSpeciesFilter] = useState("");
-
-  const [selected, setSelected] = useState<ReportedPost | null>(null);
 
   const speciesFilterOptions = [
     { value: 'dog', labelKey: 'species.dogs' },
@@ -62,9 +59,8 @@ export default function ReportedPets() {
 
   const fetchPosts = async () => {
     let query = supabase
-      .from('reported_posts')
+      .from('reported_posts_public')
       .select('*')
-      .eq('status', 'active')
       .order('created_at', { ascending: false });
 
     if (searchTerm) {
@@ -131,13 +127,19 @@ export default function ReportedPets() {
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => setSelected(post)}>
+            <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/reported/${post.id}`)}>
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img 
-                    src={post.images[0]} 
+                    src={post.images[0].startsWith('http') 
+                      ? post.images[0] 
+                      : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
+                    }
                     alt={post.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -165,30 +167,6 @@ export default function ReportedPets() {
                 <div className="flex items-center text-xs text-muted-foreground mb-3">
                   <Calendar className="h-3 w-3 mr-1" />
                   <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                </div>
-
-                <div className="flex gap-2">
-                  {post.contact_whatsapp && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`https://wa.me/${post.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_phone && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`tel:${post.contact_phone}`}>
-                        {t('form.phone')}
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_email && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`mailto:${post.contact_email}`}>
-                        Email
-                      </a>
-                    </Button>
-                  )}
                 </div>
               </CardContent>
             </Card>
