@@ -322,9 +322,200 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      adoption_posts_public: {
+        Row: {
+          age: string | null
+          breed: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          location_lat: number | null
+          location_lng: number | null
+          location_text: string | null
+          species: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          age?: string | null
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          species?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          age?: string | null
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          species?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      classifieds_public: {
+        Row: {
+          category: string | null
+          condition: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          location_lat: number | null
+          location_lng: number | null
+          location_text: string | null
+          price: number | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          category?: string | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          price?: number | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          category?: string | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          price?: number | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      lost_posts_public: {
+        Row: {
+          breed: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          location_lat: number | null
+          location_lng: number | null
+          location_text: string | null
+          lost_at: string | null
+          species: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          lost_at?: string | null
+          species?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          lost_at?: string | null
+          species?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      reported_posts_public: {
+        Row: {
+          breed: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          location_lat: number | null
+          location_lng: number | null
+          location_text: string | null
+          seen_at: string | null
+          species: string | null
+          state: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          seen_at?: string | null
+          species?: string | null
+          state?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          breed?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_text?: string | null
+          seen_at?: string | null
+          species?: string | null
+          state?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_post_contact_info: {
+        Args: { post_id: string; post_table: string }
+        Returns: {
+          contact_email: string
+          contact_phone: string
+          contact_whatsapp: string
+          store_contact: string
+        }[]
+      }
       resolve_post: {
         Args: { owner_secret: string; post_id: string; post_type: string }
         Returns: boolean
