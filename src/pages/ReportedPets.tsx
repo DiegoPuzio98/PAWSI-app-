@@ -46,6 +46,7 @@ export default function ReportedPets() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [speciesFilter, setSpeciesFilter] = useState("all");
+  const [breedFilter, setBreedFilter] = useState("");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [searchParams] = useSearchParams();
@@ -68,7 +69,7 @@ export default function ReportedPets() {
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter, colorFilters, locationFilter]);
+  }, [searchTerm, speciesFilter, breedFilter, colorFilters, locationFilter]);
 
   const fetchPosts = async () => {
     let query = supabase

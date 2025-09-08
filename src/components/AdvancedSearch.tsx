@@ -8,6 +8,7 @@ import { Search, Filter, X } from "lucide-react";
 import { allColors } from "@/utils/breeds";
 import { speciesList } from "@/utils/species";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { BreedSelector } from "@/components/BreedSelector";
 
 interface AdvancedSearchProps {
   searchTerm: string;
@@ -18,6 +19,9 @@ interface AdvancedSearchProps {
   onColorFiltersChange: (colors: string[]) => void;
   locationFilter: string;
   onLocationFilterChange: (location: string) => void;
+  // Optional breed filter support
+  breedFilter?: string;
+  onBreedFilterChange?: (breed: string) => void;
   onReset: () => void;
 }
 
@@ -30,6 +34,9 @@ export function AdvancedSearch({
   onColorFiltersChange,
   locationFilter,
   onLocationFilterChange,
+  // optional breed filter
+  breedFilter,
+  onBreedFilterChange,
   onReset
 }: AdvancedSearchProps) {
   const { t } = useLanguage();
@@ -47,7 +54,7 @@ export function AdvancedSearch({
     onColorFiltersChange(colorFilters.filter(c => c !== color));
   };
 
-  const hasActiveFilters = speciesFilter !== "all" || colorFilters.length > 0 || locationFilter;
+  const hasActiveFilters = speciesFilter !== "all" || !!breedFilter || colorFilters.length > 0 || !!locationFilter;
 
   return (
     <div className="space-y-4">
@@ -104,6 +111,17 @@ export function AdvancedSearch({
                   </SelectContent>
                 </Select>
               </div>
+              {/* Optional Breed filter */}
+              {onBreedFilterChange && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">{t('form.breed')}</label>
+                  <BreedSelector
+                    species={speciesFilter}
+                    breed={breedFilter || ''}
+                    onBreedChange={(b) => onBreedFilterChange(b)}
+                  />
+                </div>
+              )}
 
               {/* Location filter */}
               <div>
@@ -146,6 +164,15 @@ export function AdvancedSearch({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => onSpeciesFilterChange("all")}
+              />
+            </Badge>
+          )}
+          {breedFilter && onBreedFilterChange && (
+            <Badge variant="secondary" className="text-xs">
+              🐾 {breedFilter}
+              <X 
+                className="h-3 w-3 ml-1 cursor-pointer" 
+                onClick={() => onBreedFilterChange("")}
               />
             </Badge>
           )}
