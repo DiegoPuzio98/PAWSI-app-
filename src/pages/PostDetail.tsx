@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ArrowLeft, Calendar, MapPin, Phone, MessageCircle, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MapboxPreview } from "@/components/MapboxPreview";
@@ -185,25 +186,48 @@ export default function PostDetail() {
         </Button>
 
         <Card className="overflow-hidden">
-          {/* Images */}
+          {/* Images Carousel */}
           {post.images && post.images.length > 0 && (
-            <div className="relative h-96 w-full overflow-hidden">
-              <img
-                src={post.images[0].startsWith('http') 
-                  ? post.images[0] 
-                  : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
-                }
-                alt={post.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
-              />
+            <div className="relative">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {post.images.map((image, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative h-96 w-full overflow-hidden">
+                        <img
+                          src={image.startsWith('http') 
+                            ? image 
+                            : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${image}`
+                          }
+                          alt={`${post.title} - Imagen ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {post.images.length > 1 && (
+                  <>
+                    <CarouselPrevious className="absolute left-4 top-1/2" />
+                    <CarouselNext className="absolute right-4 top-1/2" />
+                  </>
+                )}
+              </Carousel>
               <div className="absolute top-4 left-4">
                 <Badge variant={getTypeVariant() as any}>
                   {getTypeLabel()}
                 </Badge>
               </div>
+              {post.images.length > 1 && (
+                <div className="absolute bottom-4 right-4">
+                  <Badge variant="outline" className="bg-black/50 text-white border-white/30">
+                    {post.images.length} fotos
+                  </Badge>
+                </div>
+              )}
               {type === 'reported' && post.state && (
                 <div className="absolute top-4 right-4">
                   <Badge>

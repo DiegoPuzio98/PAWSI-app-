@@ -13,7 +13,7 @@ interface Post {
   created_at: string;
   species?: string;
   images?: string[];
-  type: 'lost' | 'reported';
+  type: 'lost' | 'reported' | 'adoption';
 }
 
 export const NewsStrip = () => {
@@ -33,7 +33,7 @@ export const NewsStrip = () => {
           .select('id, title, location_text, created_at, species, images')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(8);
 
         // Fetch latest reported posts
         const { data: reportedPosts } = await supabase
@@ -41,13 +41,22 @@ export const NewsStrip = () => {
           .select('id, title, location_text, created_at, species, images')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(8);
+
+        // Fetch latest adoption posts
+        const { data: adoptionPosts } = await supabase
+          .from('adoption_posts')
+          .select('id, title, location_text, created_at, species, images')
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(8);
 
         const combinedPosts: Post[] = [
           ...(lostPosts?.map(post => ({ ...post, type: 'lost' as const })) || []),
-          ...(reportedPosts?.map(post => ({ ...post, type: 'reported' as const })) || [])
+          ...(reportedPosts?.map(post => ({ ...post, type: 'reported' as const })) || []),
+          ...(adoptionPosts?.map(post => ({ ...post, type: 'adoption' as const })) || [])
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-         .slice(0, 12);
+         .slice(0, 15);
 
         setPosts(combinedPosts);
       } catch (error) {
@@ -137,8 +146,8 @@ export const NewsStrip = () => {
                   }}
                 />
                 <div className="absolute top-2 left-2">
-                  <Badge variant={post.type === 'lost' ? 'destructive' : 'default'}>
-                    {post.type === 'lost' ? t('status.lost') : t('status.reported')}
+                  <Badge variant={post.type === 'lost' ? 'destructive' : post.type === 'adoption' ? 'secondary' : 'default'}>
+                    {post.type === 'lost' ? t('status.lost') : post.type === 'adoption' ? 'En adopción' : t('status.reported')}
                   </Badge>
                 </div>
                 {post.species && (
@@ -153,8 +162,8 @@ export const NewsStrip = () => {
             <div className="p-3">
               {(!post.images || post.images.length === 0) && (
                 <div className="flex items-start justify-between mb-2">
-                  <Badge variant={post.type === 'lost' ? 'destructive' : 'default'}>
-                    {post.type === 'lost' ? t('status.lost') : t('status.reported')}
+                  <Badge variant={post.type === 'lost' ? 'destructive' : post.type === 'adoption' ? 'secondary' : 'default'}>
+                    {post.type === 'lost' ? t('status.lost') : post.type === 'adoption' ? 'En adopción' : t('status.reported')}
                   </Badge>
                   {post.species && (
                     <Badge variant="outline">{t(`species.${post.species}`)}</Badge>

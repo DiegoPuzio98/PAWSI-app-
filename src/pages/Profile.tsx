@@ -4,12 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Navigation } from "@/components/navigation";
+import { LocationSelector } from "@/components/LocationSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { uploadFile } from "@/utils/fileUpload";
-import { User, Camera, Save, Trash2 } from "lucide-react";
+import { User, Camera, Save, Trash2, MapPin } from "lucide-react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 
@@ -18,6 +19,8 @@ interface Profile {
   display_name: string;
   avatar_url: string;
   created_at: string;
+  country?: string;
+  province?: string;
 }
 
 export default function Profile() {
@@ -25,6 +28,8 @@ export default function Profile() {
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [displayName, setDisplayName] = useState("");
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,6 +58,8 @@ export default function Profile() {
       if (data) {
         setProfile(data);
         setDisplayName(data.display_name || '');
+        setCountry(data.country || '');
+        setProvince(data.province || '');
       } else {
         // Create profile if it doesn't exist
         const { data: newProfile, error: createError } = await supabase
@@ -64,6 +71,8 @@ export default function Profile() {
         if (createError) throw createError;
         setProfile(newProfile);
         setDisplayName(newProfile.display_name || '');
+        setCountry(newProfile.country || '');
+        setProvince(newProfile.province || '');
       }
     } catch (error: any) {
       console.error('Error fetching profile:', error);
@@ -96,13 +105,15 @@ export default function Profile() {
         .update({
           display_name: displayName,
           avatar_url: avatarUrl,
+          country: country || null,
+          province: province || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', user.id);
 
       if (error) throw error;
 
-      setProfile({ ...profile, display_name: displayName, avatar_url: avatarUrl });
+      setProfile({ ...profile, display_name: displayName, avatar_url: avatarUrl, country, province });
       setSelectedFile(null);
       toast({ title: "¡Actualizado!", description: "Perfil actualizado correctamente" });
     } catch (error: any) {
@@ -220,6 +231,23 @@ export default function Profile() {
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   El email no se puede cambiar desde aquí
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  <MapPin className="h-4 w-4 inline mr-1" />
+                  Ubicación
+                </label>
+                <LocationSelector
+                  country={country}
+                  province={province}
+                  onCountryChange={setCountry}
+                  onProvinceChange={setProvince}
+                  disabled={saving}
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Esto ayuda a mostrar contenido relevante para tu área
                 </p>
               </div>
 

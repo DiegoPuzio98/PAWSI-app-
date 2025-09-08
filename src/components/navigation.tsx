@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Stethoscope, Phone, LogOut, User, Settings, Bookmark } from "lucide-react";
-import { PawIcon } from "@/components/ui/paw-icon";
+import petHomeLogo from "@/assets/pet-home-logo.png";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,7 +36,7 @@ export const Navigation = () => {
     <header className="sticky top-0 z-50 bg-background border-b shadow-sm">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <PawIcon size={32} />
+          <img src={petHomeLogo} alt="Pawsi" className="h-8 w-8" />
           <span className="text-2xl font-bold text-primary">Pawsi</span>
         </Link>
 

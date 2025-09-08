@@ -4,11 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Navigation } from "@/components/navigation";
+import { LocationSelector } from "@/components/LocationSelector";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/components/ui/use-toast";
 import { PawIcon } from "@/components/ui/paw-icon";
-import { Mail, Lock, User, AlertCircle } from "lucide-react";
+import { Mail, Lock, User, AlertCircle, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function AuthPage() {
@@ -16,6 +17,8 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +33,7 @@ export default function AuthPage() {
 
     try {
       if (isSignUp) {
-        const { error } = await signUp(email, password, displayName);
+        const { error } = await signUp(email, password, displayName, { country, province });
         if (error) {
           if (error.message.includes('already registered')) {
             setError('Este email ya está registrado. Intenta iniciar sesión.');
@@ -120,6 +123,25 @@ export default function AuthPage() {
                   </div>
                 )}
 
+                {isSignUp && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2">
+                      <MapPin className="h-4 w-4 inline mr-1" />
+                      Ubicación
+                    </label>
+                    <LocationSelector
+                      country={country}
+                      province={province}
+                      onCountryChange={setCountry}
+                      onProvinceChange={setProvince}
+                      disabled={loading}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Esto nos ayuda a mostrar publicaciones relevantes para tu área
+                    </p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     {t('auth.email')}
@@ -178,6 +200,8 @@ export default function AuthPage() {
                     onClick={() => {
                       setIsSignUp(!isSignUp);
                       setError(null);
+                      setCountry("");
+                      setProvince("");
                     }}
                     className="text-primary hover:underline font-medium"
                     disabled={loading}
