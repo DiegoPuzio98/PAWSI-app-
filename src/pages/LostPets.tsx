@@ -81,7 +81,7 @@ export default function LostPets() {
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter, colorFilters, locationFilter]);
+  }, [searchTerm, speciesFilter, colorFilters, locationFilter, userProfile]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -90,6 +90,14 @@ export default function LostPets() {
       .eq('status', 'active')
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
+
+    // Filter by user's location first if profile exists
+    if (userProfile?.country) {
+      query = query.eq('country', userProfile.country);
+      if (userProfile.province) {
+        query = query.eq('province', userProfile.province);
+      }
+    }
 
     if (searchTerm) {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);

@@ -138,6 +138,8 @@ export default function LostNew() {
         owner_secret_hash,
         status: "active",
         user_id: user?.id,
+        country: country || null,
+        province: province || null,
       });
 
       if (error) throw error;

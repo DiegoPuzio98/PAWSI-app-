@@ -98,6 +98,8 @@ export default function MarketplaceNew() {
         store_contact: storeContact || null,
         status: "active",
         user_id: user?.id,
+        country: country || null,
+        province: province || null,
       });
 
       if (error) throw error;

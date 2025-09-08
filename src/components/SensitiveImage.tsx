@@ -7,10 +7,11 @@ interface SensitiveImageProps {
   alt: string;
   className?: string;
   isSensitive?: boolean;
+  disableReveal?: boolean;
   onError?: (e: any) => void;
 }
 
-export function SensitiveImage({ src, alt, className, isSensitive = false, onError }: SensitiveImageProps) {
+export function SensitiveImage({ src, alt, className, isSensitive = false, disableReveal = false, onError }: SensitiveImageProps) {
   const [revealed, setRevealed] = useState(false);
 
   if (!isSensitive) {
@@ -25,14 +26,16 @@ export function SensitiveImage({ src, alt, className, isSensitive = false, onErr
           <p className="text-sm font-medium mb-2 text-foreground">
             Contenido potencialmente sensible
           </p>
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => setRevealed(true)}
-            className="bg-background/80"
-          >
-            ¿Ver de todas formas?
-          </Button>
+          {!disableReveal && (
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => setRevealed(true)}
+              className="bg-background/80"
+            >
+              ¿Ver de todas formas?
+            </Button>
+          )}
         </div>
         <img 
           src={src} 

@@ -205,6 +205,7 @@ export default function ReportedPets() {
                 alt={post.title}
                 className="w-full h-full object-cover"
                 isSensitive={post.state === 'injured' || post.state === 'sick'}
+                disableReveal={post.state === 'injured' || post.state === 'sick'}
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}

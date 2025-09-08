@@ -179,6 +179,7 @@ export const NewsStrip = () => {
                   alt={post.title}
                   className="w-full h-full object-cover"
                   isSensitive={post.type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
+                  disableReveal={post.type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
