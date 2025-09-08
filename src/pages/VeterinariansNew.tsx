@@ -118,7 +118,7 @@ export default function VeterinariansNew() {
                 <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Clínica Veterinaria San Martín" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Teléfono</label>
+                <label className="block text-sm font-medium mb-1">Teléfono (opcional)</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Ej: +54911..." />
                 <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
@@ -131,12 +131,12 @@ export default function VeterinariansNew() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción</label>
+              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Describe los servicios y características de la veterinaria..." />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Servicios</label>
+              <label className="block text-sm font-medium mb-1">Servicios (opcional)</label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-2">
                 {commonServices.map((service) => (
                   <Button
@@ -189,7 +189,7 @@ export default function VeterinariansNew() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <label className="block text-sm font-medium mb-1">Fotos (opcional)</label>
               <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
               <FileUpload
                 onFilesSelected={(files) => {
@@ -211,16 +211,16 @@ export default function VeterinariansNew() {
 
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                <label className="block text-sm font-medium mb-1">WhatsApp (opcional)</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
                 <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium mb-1">Email (opcional)</label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Sitio Web</label>
+                <label className="block text-sm font-medium mb-1">Sitio Web (opcional)</label>
                 <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://..." />
               </div>
             </div>

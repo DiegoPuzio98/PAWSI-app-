@@ -145,8 +145,8 @@ export default function MarketplaceNew() {
                 </Select>
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <div>
+                <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
               <LocationSelector
                 country={country}
                 province={province}
@@ -157,21 +157,21 @@ export default function MarketplaceNew() {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Estado</label>
+                <label className="block text-sm font-medium mb-1">Estado (opcional)</label>
                 <Input value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="Nuevo/Usado" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Precio</label>
+                <label className="block text-sm font-medium mb-1">Precio (opcional)</label>
                 <Input type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Área</label>
+                <label className="block text-sm font-medium mb-1">Área (opcional)</label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Barrio / zona" />
                 <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción</label>
+              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
@@ -185,7 +185,7 @@ export default function MarketplaceNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <label className="block text-sm font-medium mb-1">Fotos (opcional)</label>
               <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
               <FileUpload
                 onFilesSelected={(files) => {
@@ -206,16 +206,16 @@ export default function MarketplaceNew() {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                <label className="block text-sm font-medium mb-1">WhatsApp (opcional)</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
                 <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium mb-1">Email (opcional)</label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Contacto de tienda</label>
+                <label className="block text-sm font-medium mb-1">Contacto de tienda (opcional)</label>
                 <Input value={storeContact} onChange={(e) => setStoreContact(e.target.value)} placeholder="@mitienda" />
               </div>
             </div>

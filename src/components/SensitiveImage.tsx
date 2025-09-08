@@ -26,7 +26,7 @@ export function SensitiveImage({ src, alt, className, isSensitive = false, disab
         role="button"
         aria-label="Revelar contenido sensible"
       >
-        <div className="absolute inset-0 backdrop-blur-sm bg-black/20 flex flex-col items-center justify-center p-4 text-center pointer-events-none">
+        <div className="absolute inset-0 backdrop-blur-sm bg-black/20 flex flex-col items-center justify-center p-4 text-center">
           <AlertTriangle className="h-8 w-8 text-orange-500 mb-2" />
           <p className="text-sm font-medium mb-2 text-foreground">
             Contenido potencialmente sensible
@@ -36,7 +36,7 @@ export function SensitiveImage({ src, alt, className, isSensitive = false, disab
               size="sm" 
               variant="outline"
               onClick={(e) => { e.stopPropagation(); setRevealed(true); }}
-              className="bg-background/80 pointer-events-auto"
+              className="bg-background/80"
             >
               ¿Ver de todas formas?
             </Button>

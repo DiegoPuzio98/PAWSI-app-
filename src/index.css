@@ -102,4 +102,32 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Red asterisks for required fields */
+  label:has(+ input[required])::after,
+  label:has(+ textarea[required])::after,
+  label:has(+ select[required])::after,
+  label:has(+ [role="combobox"][required])::after,
+  label[for] + *[required] ~ label::after,
+  label:contains("*")::after {
+    content: " *";
+    color: hsl(var(--destructive));
+  }
+
+  /* Toast dark beige styling */
+  .toaster [data-sonner-toast] {
+    background-color: hsl(30 20% 25%) !important;
+    border-color: hsl(30 15% 35%) !important;
+    color: hsl(35 25% 96%) !important;
+  }
+  
+  .toaster [data-sonner-toast][data-type="success"] {
+    background-color: hsl(120 20% 25%) !important;
+    border-color: hsl(120 15% 35%) !important;
+  }
+  
+  .toaster [data-sonner-toast][data-type="error"] {
+    background-color: hsl(0 20% 25%) !important;
+    border-color: hsl(0 15% 35%) !important;
+  }
 }

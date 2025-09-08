@@ -151,7 +151,7 @@ export default function AdoptionsNew() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Especie</label>
+                <label className="block text-sm font-medium mb-1">Especie (opcional)</label>
                 <Select value={species} onValueChange={setSpecies}>
                   <SelectTrigger>
                     <SelectValue placeholder="Especie" />
@@ -164,7 +164,7 @@ export default function AdoptionsNew() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Raza</label>
+                <label className="block text-sm font-medium mb-1">Raza (opcional)</label>
                 <BreedSelector 
                   species={species}
                   breed={breed}
@@ -173,7 +173,7 @@ export default function AdoptionsNew() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
               <LocationSelector
                 country={country}
                 province={province}
@@ -184,17 +184,17 @@ export default function AdoptionsNew() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Edad</label>
+                <label className="block text-sm font-medium mb-1">Edad (opcional)</label>
                 <Input value={age} onChange={(e) => setAge(e.target.value)} placeholder="Ej: 3 meses" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Área</label>
+                <label className="block text-sm font-medium mb-1">Área (opcional)</label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Barrio / zona" />
                 <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Colores</label>
+              <label className="block text-sm font-medium mb-1">Colores (opcional)</label>
               <ColorSelector 
                 selectedColors={colors}
                 onColorsChange={setColors}
@@ -202,7 +202,7 @@ export default function AdoptionsNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción</label>
+              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
@@ -216,7 +216,7 @@ export default function AdoptionsNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <label className="block text-sm font-medium mb-1">Fotos (opcional)</label>
               <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
               <FileUpload
                 onFilesSelected={(files) => {
@@ -237,17 +237,17 @@ export default function AdoptionsNew() {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                <label className="block text-sm font-medium mb-1">WhatsApp (opcional)</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
                 <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Teléfono</label>
+                <label className="block text-sm font-medium mb-1">Teléfono (opcional)</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
                 <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium mb-1">Email (opcional)</label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>

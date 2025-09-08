@@ -176,7 +176,7 @@ export default function ReportedNew() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Especie</label>
+                <label className="block text-sm font-medium mb-1">Especie (opcional)</label>
                  <Select value={species} onValueChange={setSpecies}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('form.species')} />
@@ -189,7 +189,7 @@ export default function ReportedNew() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Raza</label>
+                <label className="block text-sm font-medium mb-1">Raza (opcional)</label>
                 <BreedSelector 
                   species={species}
                   breed={breed}
@@ -198,7 +198,7 @@ export default function ReportedNew() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Colores</label>
+              <label className="block text-sm font-medium mb-1">Colores (opcional)</label>
               <ColorSelector 
                 selectedColors={colors}
                 onColorsChange={setColors}
@@ -206,11 +206,11 @@ export default function ReportedNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción</label>
+              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
               <LocationSelector
                 country={country}
                 province={province}
@@ -226,7 +226,7 @@ export default function ReportedNew() {
                 <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Estado del avistamiento</label>
+                <label className="block text-sm font-medium mb-1">Estado del avistamiento (opcional)</label>
                 <Select value={state} onValueChange={setState}>
                   <SelectTrigger>
                     <SelectValue placeholder="Estado" />
@@ -255,7 +255,7 @@ export default function ReportedNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <label className="block text-sm font-medium mb-1">Fotos (opcional)</label>
               {state === "dead" ? (
                 <div className="p-4 border rounded-md bg-muted">
                   <p className="text-sm text-muted-foreground">Las fotos están deshabilitadas para reportes de animales fallecidos</p>
@@ -284,17 +284,17 @@ export default function ReportedNew() {
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                <label className="block text-sm font-medium mb-1">WhatsApp (opcional)</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
                 <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Teléfono</label>
+                <label className="block text-sm font-medium mb-1">Teléfono (opcional)</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
                 <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium mb-1">Email (opcional)</label>
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>

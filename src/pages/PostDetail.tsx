@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SensitiveImage } from "@/components/SensitiveImage";
 import { ReportDialog } from "@/components/ReportDialog";
+import { ImageLightbox } from "@/components/ImageLightbox";
 
 interface PostData {
   id: string;
@@ -55,6 +56,8 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [loadingContact, setLoadingContact] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -196,14 +199,20 @@ export default function PostDetail() {
                 <CarouselContent>
                   {post.images.map((image, index) => (
                     <CarouselItem key={index}>
-                      <div className="relative h-96 w-full overflow-hidden">
+                      <div 
+                        className="relative h-96 w-full overflow-hidden cursor-pointer"
+                        onClick={() => {
+                          setLightboxIndex(index);
+                          setLightboxOpen(true);
+                        }}
+                      >
                         <SensitiveImage
                           src={image.startsWith('http') 
                             ? image 
                             : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${image}`
                           }
                           alt={`${post.title} - Imagen ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
                           isSensitive={type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
@@ -445,6 +454,18 @@ export default function PostDetail() {
           postId={post.id}
           postType={(type === 'classifieds' ? 'classified' : (type as any))}
         />
+        
+        {/* Image Lightbox */}
+        {post.images && post.images.length > 0 && (
+          <ImageLightbox
+            images={post.images}
+            currentIndex={lightboxIndex}
+            isOpen={lightboxOpen}
+            onClose={() => setLightboxOpen(false)}
+            isSensitive={type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
+            title={post.title}
+          />
+        )}
       </div>
     </div>
   );

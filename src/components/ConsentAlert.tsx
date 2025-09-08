@@ -17,8 +17,8 @@ export function ConsentAlert({ fieldValue, fieldType }: ConsentAlertProps) {
   if (!showAlert) return null;
 
   const message = fieldType === 'phone' 
-    ? "Al completar este campo, consientes que tu número de teléfono sea visible públicamente."
-    : "Al completar este campo, consientes que tu información de contacto sea visible públicamente.";
+    ? "Al completar este campo, consientes que la información sea visible públicamente."
+    : "Al completar este campo, consientes que la información sea visible públicamente.";
 
   return (
     <Alert className="mt-2 border-orange-200 bg-orange-50">
