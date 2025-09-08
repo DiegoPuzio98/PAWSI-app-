@@ -72,10 +72,15 @@ export const NewsStrip = () => {
       if (!scrollContainer) return;
 
       if (!isPaused) {
-        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-        if (maxScroll > 0) {
-          const next = scrollContainer.scrollLeft + step;
-          scrollContainer.scrollLeft = next >= maxScroll ? 0 : next;
+        const next = scrollContainer.scrollLeft + step;
+        if (posts.length > 1) {
+          const originalWidth = scrollContainer.scrollWidth / 2; // because we duplicated the items
+          scrollContainer.scrollLeft = next >= originalWidth ? (next - originalWidth) : next;
+        } else {
+          const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+          if (maxScroll > 0) {
+            scrollContainer.scrollLeft = next >= maxScroll ? 0 : next;
+          }
         }
       }
 
@@ -99,6 +104,8 @@ export const NewsStrip = () => {
     );
   }
 
+  const displayedPosts = posts.length > 1 ? [...posts, ...posts] : posts;
+
   return (
     <div className="w-full py-4">
       <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
@@ -110,9 +117,9 @@ export const NewsStrip = () => {
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
       >
-        {posts.map((post) => (
+        {displayedPosts.map((post, idx) => (
           <Card 
-            key={post.id} 
+            key={`${post.id}-${idx}`} 
             className="min-w-[280px] bg-card hover:shadow-md transition-shadow overflow-hidden cursor-pointer"
             onClick={() => navigate(`/${post.type}/${post.id}`)}
           >

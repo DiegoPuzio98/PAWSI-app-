@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Phone, LogOut, User, Settings } from "lucide-react";
+import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Phone, LogOut, User, Settings, Bookmark } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -26,8 +26,9 @@ export const Navigation = () => {
   ];
 
   const authMenuItems = [
-    { icon: User, label: "Dashboard", path: "/dashboard" },
-    { icon: Settings, label: "Perfil", path: "/profile" },
+    { icon: User, label: t('nav.dashboard'), path: "/dashboard" },
+    { icon: Bookmark, label: t('nav.saved'), path: "/saved" },
+    { icon: Settings, label: t('nav.profile'), path: "/profile" },
   ];
 
   return (
@@ -49,7 +50,7 @@ export const Navigation = () => {
           ) : (
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-2" />
-              Salir
+              {t('auth.signOut')}
             </Button>
           )}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
