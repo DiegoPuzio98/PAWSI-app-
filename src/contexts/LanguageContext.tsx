@@ -17,6 +17,9 @@ const translations = {
     'nav.marketplace': 'Compra y Venta',
     'nav.adoptions': 'Adopciones',
     'nav.support': 'Soporte',
+    'nav.dashboard': 'Datos de cuenta',
+    'nav.saved': 'Guardados',
+    'nav.profile': 'Perfil',
     
     // Homepage
     'home.welcome': 'Bienvenido a Pawsi',
@@ -45,6 +48,7 @@ const translations = {
     'auth.welcomeBack': '¡Bienvenido de vuelta!',
     'auth.signedInSuccess': 'Has iniciado sesión exitosamente.',
     'auth.error': 'Error',
+    'auth.signOut': 'Salir',
     
     // Forms
     'form.title': 'Título',
@@ -72,6 +76,11 @@ const translations = {
     'status.reported': 'Reportada',
     'status.active': 'Activa',
     'status.resolved': 'Resuelta',
+    'status.seen': 'Visto',
+    'status.injured': 'Herido',
+    'status.sick': 'Enfermo',
+    'status.dead': 'Sin vida',
+    'status.other': 'Otro',
     
     // Actions
     'action.search': 'Buscar',
@@ -94,6 +103,9 @@ const translations = {
     'nav.marketplace': 'Buy & Sell',
     'nav.adoptions': 'Adoptions',
     'nav.support': 'Support',
+    'nav.dashboard': 'Account data',
+    'nav.saved': 'Saved',
+    'nav.profile': 'Profile',
     
     // Homepage
     'home.welcome': 'Welcome to Pawsi',
@@ -122,6 +134,7 @@ const translations = {
     'auth.welcomeBack': 'Welcome back!',
     'auth.signedInSuccess': 'You\'ve been successfully signed in.',
     'auth.error': 'Error',
+    'auth.signOut': 'Sign out',
     
     // Forms
     'form.title': 'Title',
@@ -149,6 +162,11 @@ const translations = {
     'status.reported': 'Reported',
     'status.active': 'Active',
     'status.resolved': 'Resolved',
+    'status.seen': 'Seen',
+    'status.injured': 'Injured',
+    'status.sick': 'Sick',
+    'status.dead': 'Deceased',
+    'status.other': 'Other',
     
     // Actions
     'action.search': 'Search',

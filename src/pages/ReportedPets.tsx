@@ -41,6 +41,7 @@ const speciesKeyForI18n = (s?: string | null) => {
   }
 };
 
+
 export default function ReportedPets() {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -52,6 +53,17 @@ export default function ReportedPets() {
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [searchParams] = useSearchParams();
+
+  const statusKeyForI18n = (s?: string | null) => {
+    switch (s) {
+      case 'seen': return 'seen';
+      case 'injured': return 'injured';
+      case 'sick': return 'sick';
+      case 'dead': return 'dead';
+      case 'other': return 'other';
+      default: return '';
+    }
+  };
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -159,7 +171,7 @@ export default function ReportedPets() {
           {posts.map((post) => (
             <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/reported/${post.id}`)}>
           {post.images?.[0] && (
-            <div className="aspect-video bg-muted">
+            <div className="relative aspect-video bg-muted">
               <SensitiveImage 
                 src={post.images[0].startsWith('http') 
                   ? post.images[0] 
@@ -172,16 +184,30 @@ export default function ReportedPets() {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
+              {post.state && (
+                <div className="absolute top-2 left-2">
+                  <Badge>
+                    {t(`status.${statusKeyForI18n(post.state)}`)}
+                  </Badge>
+                </div>
+              )}
             </div>
           )}
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{post.title}</h3>
-                  {post.species && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                      {t(`species.${speciesKeyForI18n(post.species)}`)}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {post.species && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                        {t(`species.${speciesKeyForI18n(post.species)}`)}
+                      </span>
+                    )}
+                    {!post.images?.[0] && post.state && (
+                      <Badge>
+                        {t(`status.${statusKeyForI18n(post.state)}`)}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
                 
                 {post.breed && (

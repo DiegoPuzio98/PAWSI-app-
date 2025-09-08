@@ -27,6 +27,7 @@ interface PostData {
   seen_at?: string;
   state?: string;
   status?: string;
+  user_id?: string;
   category?: string;
   condition?: string;
   price?: number;
@@ -259,7 +260,7 @@ export default function PostDetail() {
               {post.state && (
                 <div>
                   <p className="text-sm text-muted-foreground">Estado</p>
-                  <p className="font-medium">{post.state}</p>
+                  <p className="font-medium">{t(`status.${post.state}`)}</p>
                 </div>
               )}
             </div>
@@ -315,8 +316,8 @@ export default function PostDetail() {
             <Separator className="my-6" />
 
             {/* Contact Section */}
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Información de Contacto</h2>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-lg font-semibold">Información de Contacto</h2>
               {!contactInfo ? (
                 <Button 
                   onClick={loadContactInfo} 
@@ -357,13 +358,27 @@ export default function PostDetail() {
                       Email: {contactInfo.contact_email}
                     </Button>
                   )}
-                  {contactInfo.store_contact && (
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Contacto de tienda:</p>
-                      <p className="font-medium">{contactInfo.store_contact}</p>
-                    </div>
-                  )}
                 </div>
+              )}
+
+              {/* Owner actions */}
+              {user && post.user_id === user.id && post.status === 'active' && (
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const table = type === 'reported' ? 'reported_posts' : type === 'lost' ? 'lost_posts' : type === 'adoption' ? 'adoption_posts' : 'classifieds';
+                      const { error } = await supabase.from(table).update({ status: 'resolved' }).eq('id', post.id);
+                      if (error) throw error;
+                      toast({ title: 'Caso marcado como resuelto' });
+                      navigate(-1);
+                    } catch (e: any) {
+                      toast({ title: 'Error', description: e.message, variant: 'destructive' });
+                    }
+                  }}
+                >
+                  {t('action.markResolved')}
+                </Button>
               )}
             </div>
           </div>

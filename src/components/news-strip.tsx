@@ -144,7 +144,7 @@ export const NewsStrip = () => {
                 {post.species && (
                   <div className="absolute top-2 right-2">
                     <Badge variant="outline" className="bg-background/80">
-                      {t(`species.${post.species}`)}
+                      {t(`species.${post.species === 'dog' ? 'dogs' : post.species === 'cat' ? 'cats' : post.species === 'bird' ? 'birds' : post.species === 'rodent' ? 'rodents' : post.species}`)}
                     </Badge>
                   </div>
                 )}

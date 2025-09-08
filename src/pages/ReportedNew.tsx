@@ -128,14 +128,8 @@ export default function ReportedNew() {
 
       if (error) throw error;
 
-      setSecret(s);
-      toast({ title: "¡Reporte publicado!", description: "Guarda tu código secreto para cerrar el caso." });
-    } catch (e: any) {
-      console.error(e);
-      toast({ title: "Error al publicar", description: e.message ?? "Inténtalo de nuevo" });
-    } finally {
-      setSubmitting(false);
-    }
+      toast({ title: "¡Reporte publicado!", description: "Tu reporte se publicó correctamente." });
+      window.location.href = "/reported";
   };
 
   return (
@@ -284,21 +278,6 @@ export default function ReportedNew() {
           </CardContent>
         </Card>
 
-        <Dialog open={!!secret} onOpenChange={() => setSecret(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Guarda este código secreto</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2">
-              <p>Usa este código para marcar el caso como resuelto:</p>
-              <p className="text-2xl font-bold text-primary select-all">{secret}</p>
-              <p className="text-sm text-muted-foreground">No podremos recuperarlo si lo pierdes.</p>
-            </div>
-            <DialogFooter>
-              <Button onClick={() => (window.location.href = "/reported")}>Ir a avistamientos</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </main>
     </div>
   );
