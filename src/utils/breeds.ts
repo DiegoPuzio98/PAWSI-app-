@@ -1,8 +1,8 @@
 // Complete breed lists by species
 export const breedsBySpecies = {
   dog: [
-    'Mestizo', 'Desconocido',
-    'Labrador', 'Golden Retriever', 'Pastor Alemán', 'Bulldog Francés', 'Bulldog Inglés',
+    'Desconocido', 'Sin raza definida',
+    'Mestizo', 'Labrador', 'Golden Retriever', 'Pastor Alemán', 'Bulldog Francés', 'Bulldog Inglés',
     'Chihuahua', 'Yorkshire Terrier', 'Poodle', 'Caniche', 'Rottweiler', 'Boxer',
     'Dálmata', 'Beagle', 'Husky Siberiano', 'Border Collie', 'Cocker Spaniel',
     'Dachshund', 'Salchicha', 'Shih Tzu', 'Maltés', 'Pug', 'Carlino',
@@ -13,7 +13,8 @@ export const breedsBySpecies = {
     'Pastor Belga', 'Pastor Australiano', 'Bichón', 'Papillón', 'Pomerania'
   ],
   cat: [
-    'Mestizo', 'Desconocido', 'Común Europeo',
+    'Desconocido', 'Sin raza definida',
+    'Mestizo', 'Común Europeo',
     'Persa', 'Siamés', 'Maine Coon', 'British Shorthair', 'Ragdoll',
     'Bengalí', 'Sphynx', 'Scottish Fold', 'Abisinio', 'Russian Blue',
     'Oriental', 'Birmano', 'Noruego del Bosque', 'Angora', 'Himalayo',
@@ -22,19 +23,22 @@ export const breedsBySpecies = {
     'Ocicat', 'Savannah', 'Munchkin', 'Curl Americano', 'Bobtail'
   ],
   bird: [
-    'Desconocido', 'Canario', 'Periquito', 'Cacatúa', 'Loro',
+    'Desconocido', 'Sin raza definida',
+    'Canario', 'Periquito', 'Cacatúa', 'Loro',
     'Agapornis', 'Ninfa', 'Jilguero', 'Diamante', 'Mandarín',
     'Pinzón', 'Cardenal', 'Ruiseñor', 'Gorrión', 'Paloma',
     'Tórtola', 'Cotorra', 'Papagayo', 'Guacamayo', 'Amazona',
     'Yacaré', 'Benteveo', 'Hornero', 'Calandria', 'Zorzal'
   ],
   rodent: [
-    'Desconocido', 'Hamster', 'Cobayo', 'Chinchilla', 'Rata',
+    'Desconocido', 'Sin raza definida',
+    'Hamster', 'Cobayo', 'Chinchilla', 'Rata',
     'Ratón', 'Jerbo', 'Degú', 'Conejo', 'Hurón',
     'Ardilla', 'Erizo', 'Capibara'
   ],
   fish: [
-    'Desconocido', 'Goldfish', 'Betta', 'Guppy', 'Molly',
+    'Desconocido', 'Sin raza definida',
+    'Goldfish', 'Betta', 'Guppy', 'Molly',
     'Platy', 'Espada', 'Tetra', 'Ángel', 'Disco',
     'Cebra', 'Barbo', 'Corydora', 'Pleco', 'Oscar',
     'Ciclido', 'Koi', 'Carpa'

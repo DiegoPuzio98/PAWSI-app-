@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MapPin, Calendar, Plus, Clock } from "lucide-react";
+import { AdvancedSearch } from "@/components/AdvancedSearch";
+import { PostActions } from "@/components/PostActions";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Calendar, Plus, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface LostPost {
@@ -14,6 +15,7 @@ interface LostPost {
   title: string;
   species: string;
   breed: string;
+  colors: string[];
   description: string;
   location_text: string;
   images: string[];
@@ -30,13 +32,20 @@ export default function LostPets() {
   const [posts, setPosts] = useState<LostPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [speciesFilter, setSpeciesFilter] = useState("");
+  const [speciesFilter, setSpeciesFilter] = useState("all");
+  const [colorFilters, setColorFilters] = useState<string[]>([]);
+  const [locationFilter, setLocationFilter] = useState("");
 
-  const species = ['dogs', 'cats', 'birds', 'rodents', 'fish'];
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setSpeciesFilter("all");
+    setColorFilters([]);
+    setLocationFilter("");
+  };
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter]);
+  }, [searchTerm, speciesFilter, colorFilters, locationFilter]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -47,11 +56,15 @@ export default function LostPets() {
       .order('created_at', { ascending: false });
 
     if (searchTerm) {
-      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%`);
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);
     }
 
     if (speciesFilter && speciesFilter !== 'all') {
       query = query.eq('species', speciesFilter);
+    }
+
+    if (locationFilter) {
+      query = query.ilike('location_text', `%${locationFilter}%`);
     }
 
     const { data, error } = await query;
@@ -59,7 +72,16 @@ export default function LostPets() {
     if (error) {
       console.error('Error fetching posts:', error);
     } else {
-      setPosts(data || []);
+      let filteredData = data || [];
+      
+      // Filter by colors
+      if (colorFilters.length > 0) {
+        filteredData = filteredData.filter((post) => {
+          return post.colors && colorFilters.some((color) => post.colors.includes(color));
+        });
+      }
+      
+      setPosts(filteredData);
     }
     setLoading(false);
   };
@@ -86,33 +108,18 @@ export default function LostPets() {
           </Link>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder={t('action.search')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <Select value={speciesFilter} onValueChange={setSpeciesFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t('form.species')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las especies</SelectItem>
-              {species.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {t(`species.${s}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Advanced Search */}
+        <AdvancedSearch
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          speciesFilter={speciesFilter}
+          onSpeciesFilterChange={setSpeciesFilter}
+          colorFilters={colorFilters}
+          onColorFiltersChange={setColorFilters}
+          locationFilter={locationFilter}
+          onLocationFilterChange={setLocationFilter}
+          onReset={handleResetFilters}
+        />
 
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -148,6 +155,16 @@ export default function LostPets() {
                 {post.breed && (
                   <p className="text-sm text-muted-foreground mb-2">{post.breed}</p>
                 )}
+
+                {post.colors && post.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {post.colors.map((color) => (
+                      <Badge key={color} variant="secondary" className="text-xs">
+                        {color}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
                 
                 <p className="text-sm mb-3 line-clamp-2">{post.description}</p>
                 
@@ -166,29 +183,11 @@ export default function LostPets() {
                   <span>Expira: {new Date(post.expires_at).toLocaleDateString()}</span>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
-                  {post.contact_whatsapp && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`https://wa.me/${post.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_phone && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`tel:${post.contact_phone}`}>
-                        {t('form.phone')}
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_email && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`mailto:${post.contact_email}`}>
-                        Email
-                      </a>
-                    </Button>
-                  )}
-                </div>
+                <PostActions 
+                  postId={post.id}
+                  postType="lost"
+                  contactWhatsapp={post.contact_whatsapp}
+                />
               </CardContent>
             </Card>
           ))}

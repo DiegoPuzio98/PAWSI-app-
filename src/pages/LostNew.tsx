@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { MapboxPicker } from "@/components/MapboxPicker";
+import { ColorSelector } from "@/components/ColorSelector";
+import { BreedSelector } from "@/components/BreedSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,6 +27,7 @@ export default function LostNew() {
   const [title, setTitle] = useState("");
   const [species, setSpecies] = useState<string>("");
   const [breed, setBreed] = useState("");
+  const [colors, setColors] = useState<string[]>([]);
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [lostAt, setLostAt] = useState("");
@@ -34,6 +37,11 @@ export default function LostNew() {
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  
+  // Captcha
+  const [captchaQuestion, setCaptchaQuestion] = useState<{a: number, b: number, answer: number}>({ a: 0, b: 0, answer: 0 });
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaValid, setCaptchaValid] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [secret, setSecret] = useState<string | null>(null);
@@ -44,6 +52,19 @@ export default function LostNew() {
     return (arr[0] % 900000 + 100000).toString();
   };
 
+  const generateCaptcha = () => {
+    const a = Math.floor(Math.random() * 10) + 1;
+    const b = Math.floor(Math.random() * 10) + 1;
+    setCaptchaQuestion({ a, b, answer: a + b });
+    setCaptchaAnswer("");
+    setCaptchaValid(false);
+  };
+
+  // Generate captcha on component mount
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
+
   const onSubmit = async () => {
     if (!title || !location) {
       toast({ title: "Faltan campos obligatorios", description: "Título y área aproximada son requeridos" });
@@ -51,6 +72,10 @@ export default function LostNew() {
     }
     if (!user) {
       toast({ title: "Inicia sesión", description: "Debes iniciar sesión para publicar." });
+      return;
+    }
+    if (parseInt(captchaAnswer) !== captchaQuestion.answer) {
+      toast({ title: "Captcha incorrecto", description: "Verifica la respuesta del cálculo matemático" });
       return;
     }
     setSubmitting(true);
@@ -74,6 +99,7 @@ export default function LostNew() {
         title,
         species: normalizeSpecies(species),
         breed: breed || null,
+        colors,
         description: description || null,
         location_text: location,
         location_lat: locationLat,
@@ -131,8 +157,20 @@ export default function LostNew() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Raza</label>
-                <Input value={breed} onChange={(e) => setBreed(e.target.value)} />
+                <BreedSelector 
+                  species={species}
+                  breed={breed}
+                  onBreedChange={setBreed}
+                />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Colores</label>
+              <ColorSelector 
+                selectedColors={colors}
+                onColorsChange={setColors}
+                maxColors={4}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Descripción</label>
@@ -188,10 +226,31 @@ export default function LostNew() {
                 <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button onClick={onSubmit} disabled={submitting}>
-                {submitting ? "Publicando..." : "Publicar alerta"}
-              </Button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Verificación anti-spam *</label>
+                <div className="flex items-center gap-4">
+                  <span className="text-sm">¿Cuánto es {captchaQuestion.a} + {captchaQuestion.b}?</span>
+                  <Input 
+                    type="number"
+                    value={captchaAnswer}
+                    onChange={(e) => {
+                      setCaptchaAnswer(e.target.value);
+                      setCaptchaValid(parseInt(e.target.value) === captchaQuestion.answer);
+                    }}
+                    className="w-20"
+                    placeholder="="
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={generateCaptcha}>
+                    Nuevo
+                  </Button>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={onSubmit} disabled={submitting || !captchaValid}>
+                  {submitting ? "Publicando..." : "Publicar alerta"}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
