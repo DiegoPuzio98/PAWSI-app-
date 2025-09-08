@@ -15,23 +15,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
-const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
-const normalizeSpecies = (value?: string | null) => {
-  if (!value) return null;
-  const map: Record<string, string> = {
-    dogs: "dog",
-    cats: "cat",
-    birds: "bird",
-    rodents: "rodent",
-    fish: "fish",
-    dog: "dog",
-    cat: "cat",
-    bird: "bird",
-    rodent: "rodent",
-  };
-  const key = value.trim().toLowerCase();
-  return (map[key] ?? null) as string | null;
-};
+import { speciesList, normalizeSpecies } from "@/utils/species";
 
 export default function AdoptionsNew() {
   const { toast } = useToast();

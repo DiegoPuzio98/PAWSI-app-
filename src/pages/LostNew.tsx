@@ -9,28 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
+import { LocationPicker } from "@/components/LocationPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
-const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
-const normalizeSpecies = (value?: string | null) => {
-  if (!value) return null;
-  const map: Record<string, string> = {
-    dogs: "dog",
-    cats: "cat",
-    birds: "bird",
-    rodents: "rodent",
-    fish: "fish",
-    dog: "dog",
-    cat: "cat",
-    bird: "bird",
-    rodent: "rodent",
-  };
-  const key = value.trim().toLowerCase();
-  return (map[key] ?? null) as string | null;
-};
+import { speciesList, normalizeSpecies } from "@/utils/species";
 
 export default function LostNew() {
   const { toast } = useToast();
@@ -162,6 +147,19 @@ export default function LostNew() {
                 <label className="block text-sm font-medium mb-1">Fecha/hora de pérdida</label>
                 <Input type="datetime-local" value={lostAt} onChange={(e) => setLostAt(e.target.value)} />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación exacta (opcional)</label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Permite que otros usuarios vean la ubicación aproximada en un mapa
+              </p>
+              <LocationPicker
+                onLocationChange={(lat, lng) => {
+                  setLocationLat(lat);
+                  setLocationLng(lng);
+                }}
+                disabled={submitting}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
