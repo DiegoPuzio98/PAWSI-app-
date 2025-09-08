@@ -8,6 +8,7 @@ import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { PostActions } from "@/components/PostActions";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Plus } from "lucide-react";
+import { SensitiveImage } from "@/components/SensitiveImage";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 interface ReportedPost {
@@ -26,6 +27,7 @@ interface ReportedPost {
   contact_phone?: string | null;
   contact_email?: string | null;
   status: string;
+  state?: string;
 }
 
 const speciesKeyForI18n = (s?: string | null) => {
@@ -54,6 +56,7 @@ export default function ReportedPets() {
   const handleResetFilters = () => {
     setSearchTerm("");
     setSpeciesFilter("all");
+    setBreedFilter("");
     setColorFilters([]);
     setLocationFilter("");
   };
@@ -80,6 +83,10 @@ export default function ReportedPets() {
 
     if (searchTerm) {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);
+    }
+
+    if (breedFilter) {
+      query = query.ilike('breed', `%${breedFilter}%`);
     }
 
     if (speciesFilter && speciesFilter !== 'all') {
@@ -138,6 +145,8 @@ export default function ReportedPets() {
           onSearchTermChange={setSearchTerm}
           speciesFilter={speciesFilter}
           onSpeciesFilterChange={setSpeciesFilter}
+          breedFilter={breedFilter}
+          onBreedFilterChange={setBreedFilter}
           colorFilters={colorFilters}
           onColorFiltersChange={setColorFilters}
           locationFilter={locationFilter}
@@ -149,21 +158,22 @@ export default function ReportedPets() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
             <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/reported/${post.id}`)}>
-              {post.images?.[0] && (
-                <div className="aspect-video bg-muted">
-                  <img 
-                    src={post.images[0].startsWith('http') 
-                      ? post.images[0] 
-                      : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
-                    }
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                </div>
-              )}
+          {post.images?.[0] && (
+            <div className="aspect-video bg-muted">
+              <SensitiveImage 
+                src={post.images[0].startsWith('http') 
+                  ? post.images[0] 
+                  : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
+                }
+                alt={post.title}
+                className="w-full h-full object-cover"
+                isSensitive={post.state === 'injured' || post.state === 'sick'}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            </div>
+          )}
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg">{post.title}</h3>

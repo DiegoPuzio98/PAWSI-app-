@@ -116,7 +116,7 @@ export default function ReportedNew() {
         location_text: location,
         location_lat: locationLat,
         location_lng: locationLng,
-        images,
+        images: state === "dead" ? [] : images,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
         contact_email: email || null,
@@ -202,6 +202,8 @@ export default function ReportedNew() {
                   <SelectContent>
                     <SelectItem value="seen">Visto</SelectItem>
                     <SelectItem value="injured">Herido</SelectItem>
+                    <SelectItem value="sick">Enfermo</SelectItem>
+                    <SelectItem value="dead">Muerto</SelectItem>
                     <SelectItem value="other">Otro</SelectItem>
                   </SelectContent>
                 </Select>
@@ -222,16 +224,22 @@ export default function ReportedNew() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
-              <FileUpload
-                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
-                onFileRemove={(index) => {
-                  const newFiles = [...selectedFiles];
-                  newFiles.splice(index, 1);
-                  setSelectedFiles(newFiles);
-                }}
-                selectedFiles={selectedFiles}
-                disabled={submitting}
-              />
+              {state === "dead" ? (
+                <div className="p-4 border rounded-md bg-muted">
+                  <p className="text-sm text-muted-foreground">Las fotos están deshabilitadas para reportes de animales fallecidos</p>
+                </div>
+              ) : (
+                <FileUpload
+                  onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                  onFileRemove={(index) => {
+                    const newFiles = [...selectedFiles];
+                    newFiles.splice(index, 1);
+                    setSelectedFiles(newFiles);
+                  }}
+                  selectedFiles={selectedFiles}
+                  disabled={submitting}
+                />
+              )}
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>

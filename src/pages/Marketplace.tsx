@@ -32,7 +32,14 @@ export default function Marketplace() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  const categories = ['food', 'toys', 'accessories', 'medicine', 'services', 'other'];
+  const categories = [
+    { value: 'food', label: 'Comida' },
+    { value: 'toys', label: 'Juguetes' }, 
+    { value: 'accessories', label: 'Accesorios' },
+    { value: 'medicine', label: 'Medicina' },
+    { value: 'services', label: 'Servicios' },
+    { value: 'other', label: 'Otros' }
+  ];
 
   useEffect(() => {
     fetchClassifieds();
@@ -106,8 +113,8 @@ export default function Marketplace() {
             <SelectContent>
               <SelectItem value="all">Todas las categorías</SelectItem>
               {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
                 </SelectItem>
               ))}
             </SelectContent>

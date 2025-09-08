@@ -37,6 +37,7 @@ export default function LostNew() {
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<string>("lost");
   
   // Captcha
   const [captchaQuestion, setCaptchaQuestion] = useState<{a: number, b: number, answer: number}>({ a: 0, b: 0, answer: 0 });
@@ -111,7 +112,7 @@ export default function LostNew() {
         location_text: location,
         location_lat: locationLat,
         location_lng: locationLng,
-        images,
+        images: status === "dead" ? [] : images,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
         contact_email: email || null,
@@ -192,6 +193,20 @@ export default function LostNew() {
                 <label className="block text-sm font-medium mb-1">Fecha/hora de pérdida</label>
                 <Input type="datetime-local" value={lostAt} onChange={(e) => setLostAt(e.target.value)} />
               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Estado de la mascota</label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="lost">Perdida</SelectItem>
+                    <SelectItem value="injured">Herida</SelectItem>
+                    <SelectItem value="sick">Enferma</SelectItem>
+                    <SelectItem value="dead">Fallecida</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Ubicación exacta (opcional)</label>
@@ -208,16 +223,22 @@ export default function LostNew() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
-              <FileUpload
-                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
-                onFileRemove={(index) => {
-                  const newFiles = [...selectedFiles];
-                  newFiles.splice(index, 1);
-                  setSelectedFiles(newFiles);
-                }}
-                selectedFiles={selectedFiles}
-                disabled={submitting}
-              />
+              {status === "dead" ? (
+                <div className="p-4 border rounded-md bg-muted">
+                  <p className="text-sm text-muted-foreground">Las fotos están deshabilitadas para reportes de animales fallecidos</p>
+                </div>
+              ) : (
+                <FileUpload
+                  onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                  onFileRemove={(index) => {
+                    const newFiles = [...selectedFiles];
+                    newFiles.splice(index, 1);
+                    setSelectedFiles(newFiles);
+                  }}
+                  selectedFiles={selectedFiles}
+                  disabled={submitting}
+                />
+              )}
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,8 @@ export const NewsStrip = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchLatestPosts = async () => {
@@ -58,6 +60,32 @@ export const NewsStrip = () => {
     fetchLatestPosts();
   }, []);
 
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!scrollRef.current || isPaused || posts.length === 0) return;
+    
+    const scrollContainer = scrollRef.current;
+    let scrollAmount = 0;
+    const step = 0.5; // pixels per frame
+    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    
+    const scroll = () => {
+      if (isPaused) return;
+      
+      scrollAmount += step;
+      if (scrollAmount >= maxScroll) {
+        scrollAmount = 0; // Reset to beginning
+      }
+      
+      scrollContainer.scrollLeft = scrollAmount;
+      requestAnimationFrame(scroll);
+    };
+    
+    const animationId = requestAnimationFrame(scroll);
+    
+    return () => cancelAnimationFrame(animationId);
+  }, [isPaused, posts]);
+
   if (loading) {
     return (
       <div className="w-full py-4">
@@ -74,7 +102,14 @@ export const NewsStrip = () => {
   return (
     <div className="w-full py-4">
       <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
-      <div className="flex gap-3 overflow-x-auto pb-2">
+      <div 
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+      >
         {posts.map((post) => (
           <Card 
             key={post.id} 

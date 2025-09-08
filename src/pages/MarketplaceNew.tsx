@@ -12,7 +12,14 @@ import { MapboxPicker } from "@/components/MapboxPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useAuth } from "@/hooks/useAuth";
 
-const categories = ["food", "toys", "accessories", "medicine", "services", "other"] as const;
+const categories = [
+  { value: 'food', label: 'Comida' },
+  { value: 'toys', label: 'Juguetes' }, 
+  { value: 'accessories', label: 'Accesorios' },
+  { value: 'medicine', label: 'Medicina' },
+  { value: 'services', label: 'Servicios' },
+  { value: 'other', label: 'Otros' }
+] as const;
 
 export default function MarketplaceNew() {
   const { toast } = useToast();
@@ -109,7 +116,7 @@ export default function MarketplaceNew() {
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
