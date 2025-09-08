@@ -21,6 +21,12 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Keep a stable reference to the callback to avoid re-initializing the map
+  const callbackRef = useRef(onLocationChange);
+  useEffect(() => {
+    callbackRef.current = onLocationChange;
+  }, [onLocationChange]);
+
   useEffect(() => {
     let isMounted = true;
 
@@ -47,7 +53,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           if (disabled) return;
           const { lat, lng } = ev.lngLat;
           placeMarker([lng, lat]);
-          onLocationChange(lat, lng);
+          callbackRef.current?.(lat, lng);
         });
 
         mapRef.current.on('load', () => {
@@ -71,7 +77,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
         mapRef.current = null;
       }
     };
-  }, [onLocationChange, disabled]);
+  }, []);
 
   const placeMarker = (lngLat: [number, number]) => {
     if (!mapRef.current) return;
@@ -88,7 +94,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
       markerRef.current.remove();
     }
     markerRef.current = null;
-    onLocationChange(null, null);
+    callbackRef.current?.(null, null);
   };
 
   const getCurrentLocation = () => {
@@ -99,7 +105,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           placeMarker([lng, lat]);
-          onLocationChange(lat, lng);
+          callbackRef.current?.(lat, lng);
           mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
           setLoading(false);
         },

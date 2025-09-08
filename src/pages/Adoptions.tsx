@@ -5,7 +5,7 @@ import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Calendar, Plus, Heart } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PostActions } from "@/components/PostActions";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,17 @@ export default function Adoptions() {
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [searchParams] = useSearchParams();
   const [highlights, setHighlights] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Initialize from URL params once
+    const q = searchParams.get('q');
+    const sp = searchParams.get('species');
+    if (q) setSearchTerm(q);
+    if (sp) setSpeciesFilter(sp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -212,6 +222,8 @@ export default function Adoptions() {
                     postId={post.id}
                     postType="adoption"
                     contactWhatsapp={post.contact_whatsapp}
+                    contactPhone={post.contact_phone}
+                    contactEmail={post.contact_email}
                     isHighlighted={highlights.has(post.id)}
                     onHighlightChange={(highlighted) => {
                       const newHighlights = new Set(highlights);

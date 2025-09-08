@@ -8,7 +8,7 @@ import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { PostActions } from "@/components/PostActions";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 interface ReportedPost {
   id: string;
@@ -48,6 +48,7 @@ export default function ReportedPets() {
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [searchParams] = useSearchParams();
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -55,6 +56,15 @@ export default function ReportedPets() {
     setColorFilters([]);
     setLocationFilter("");
   };
+
+  useEffect(() => {
+    // Initialize from URL params once
+    const q = searchParams.get('q');
+    const sp = searchParams.get('species');
+    if (q) setSearchTerm(q);
+    if (sp) setSpeciesFilter(sp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -185,6 +195,8 @@ export default function ReportedPets() {
                   postId={post.id}
                   postType="reported"
                   contactWhatsapp={post.contact_whatsapp}
+                  contactPhone={post.contact_phone}
+                  contactEmail={post.contact_email}
                 />
               </CardContent>
             </Card>

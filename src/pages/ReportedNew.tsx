@@ -95,9 +95,16 @@ export default function ReportedNew() {
         }
       }
 
+      const normalizedSpecies = normalizeSpecies(species);
+      if (normalizedSpecies === 'fish') {
+        toast({ title: "Especie no permitida", description: "Peces no están permitidos en esta sección." });
+        setSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.from("reported_posts").insert({
         title,
-        species: normalizeSpecies(species),
+        species: normalizedSpecies,
         breed: breed || null,
         colors,
         description: description || null,
@@ -144,12 +151,12 @@ export default function ReportedNew() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">Especie</label>
-                <Select value={species} onValueChange={setSpecies}>
+                 <Select value={species} onValueChange={setSpecies}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('form.species')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {speciesList.map((s) => (
+                    {speciesList.filter(s => s !== 'fish').map((s) => (
                       <SelectItem key={s} value={s}>{t(`species.${s}`)}</SelectItem>
                     ))}
                   </SelectContent>

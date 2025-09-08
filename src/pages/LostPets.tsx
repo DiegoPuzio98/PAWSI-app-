@@ -8,7 +8,7 @@ import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { PostActions } from "@/components/PostActions";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Plus, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 interface LostPost {
   id: string;
@@ -35,6 +35,7 @@ export default function LostPets() {
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [searchParams] = useSearchParams();
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -42,6 +43,15 @@ export default function LostPets() {
     setColorFilters([]);
     setLocationFilter("");
   };
+
+  useEffect(() => {
+    // Initialize from URL params once
+    const q = searchParams.get('q');
+    const sp = searchParams.get('species');
+    if (q) setSearchTerm(q);
+    if (sp) setSpeciesFilter(sp);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -187,6 +197,8 @@ export default function LostPets() {
                   postId={post.id}
                   postType="lost"
                   contactWhatsapp={post.contact_whatsapp}
+                  contactPhone={post.contact_phone}
+                  contactEmail={post.contact_email}
                 />
               </CardContent>
             </Card>

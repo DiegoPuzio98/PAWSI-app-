@@ -1,16 +1,31 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { NewsStrip } from "@/components/news-strip";
-import { Camera, AlertTriangle, Heart, ShoppingCart } from "lucide-react";
+import { Camera, AlertTriangle, Heart, ShoppingCart, Search } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Index = () => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
+  const [category, setCategory] = useState("reported");
+  
+  const handleSearch = () => {
+    if (!q) {
+      navigate(`/${category}`);
+    } else {
+      navigate(`/${category}?q=${encodeURIComponent(q)}`);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -23,6 +38,32 @@ const Index = () => {
           </div>
           <h1 className="text-3xl font-bold text-primary mb-2">{t('home.welcome')}</h1>
           <p className="text-muted-foreground">{t('home.subtitle')}</p>
+        </div>
+
+        {/* Global Search */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_120px] gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('action.search')}
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="reported">Reportados</SelectItem>
+                <SelectItem value="lost">Perdidos</SelectItem>
+                <SelectItem value="adoptions">Adopciones</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button onClick={handleSearch}>Buscar</Button>
+          </div>
         </div>
 
         {/* Quick Actions */}

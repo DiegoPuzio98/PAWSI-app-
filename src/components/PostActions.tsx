@@ -9,7 +9,9 @@ import { useAuth } from "@/hooks/useAuth";
 interface PostActionsProps {
   postId: string;
   postType: 'adoption' | 'lost' | 'reported' | 'classified';
-  contactWhatsapp?: string;
+  contactWhatsapp?: string | null;
+  contactPhone?: string | null;
+  contactEmail?: string | null;
   isHighlighted?: boolean;
   onHighlightChange?: (highlighted: boolean) => void;
 }
@@ -17,7 +19,9 @@ interface PostActionsProps {
 export function PostActions({ 
   postId, 
   postType, 
-  contactWhatsapp, 
+  contactWhatsapp,
+  contactPhone,
+  contactEmail, 
   isHighlighted, 
   onHighlightChange 
 }: PostActionsProps) {
@@ -68,21 +72,39 @@ export function PostActions({
     }
   };
 
+  const handleContact = () => {
+    if (!user) {
+      toast({ title: "Inicia sesión", description: "Debes iniciar sesión para contactar al publicador." });
+      window.location.href = "/auth";
+      return;
+    }
+
+    if (contactWhatsapp) {
+      window.open(`https://wa.me/${contactWhatsapp}`, '_blank');
+      return;
+    }
+    if (contactPhone) {
+      window.location.href = `tel:${contactPhone}`;
+      return;
+    }
+    if (contactEmail) {
+      window.location.href = `mailto:${contactEmail}`;
+      return;
+    }
+    toast({ title: "No hay datos de contacto" });
+  };
+
   return (
     <div className="flex gap-2 flex-wrap">
-      {/* Red CONTACT button for WhatsApp */}
-      {contactWhatsapp && (
-        <Button 
-          size="sm" 
-          className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-          asChild
-        >
-          <a href={`https://wa.me/${contactWhatsapp}`} target="_blank" rel="noopener noreferrer">
-            <MessageCircle className="h-4 w-4 mr-1" />
-            CONTACTAR
-          </a>
-        </Button>
-      )}
+      {/* CONTACT button with fallback */}
+      <Button 
+        size="sm" 
+        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+        onClick={handleContact}
+      >
+        <MessageCircle className="h-4 w-4 mr-1" />
+        CONTACTAR
+      </Button>
 
       {/* Highlight button */}
       <Button 
