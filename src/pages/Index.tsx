@@ -58,7 +58,23 @@ const Index = () => {
           </Card>
         </div>
 
-        {/* Quick Access Buttons */}
+        {/* View Listings */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <Link to="/reported">
+            <Button variant="secondary" className="w-full h-16 flex flex-col gap-1">
+              <Camera className="h-5 w-5" />
+              <span className="text-sm">Mascotas Reportadas</span>
+            </Button>
+          </Link>
+          <Link to="/lost">
+            <Button variant="secondary" className="w-full h-16 flex flex-col gap-1">
+              <AlertTriangle className="h-5 w-5" />
+              <span className="text-sm">Mascotas Perdidas</span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* Other Services */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           <Link to="/adoptions">
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">

@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
+import { LocationPicker } from "@/components/LocationPicker";
 import { uploadFiles } from "@/utils/fileUpload";
 import bcrypt from "bcryptjs";
 
@@ -24,6 +25,8 @@ export default function ReportedNew() {
   const [breed, setBreed] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
@@ -67,6 +70,8 @@ export default function ReportedNew() {
         breed: breed || null,
         description: description || null,
         location_text: location,
+        location_lat: locationLat,
+        location_lng: locationLng,
         images,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
@@ -144,6 +149,19 @@ export default function ReportedNew() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación exacta (opcional)</label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Permite que otros usuarios vean la ubicación aproximada en un mapa
+              </p>
+              <LocationPicker
+                onLocationChange={(lat, lng) => {
+                  setLocationLat(lat);
+                  setLocationLng(lng);
+                }}
+                disabled={submitting}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
