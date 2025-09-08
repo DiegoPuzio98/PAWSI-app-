@@ -145,6 +145,16 @@ export default function AdoptionsNew() {
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
+              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
+              <LocationPicker
+                onLocationChange={(lat, lng) => {
+                  setLocationLat(lat);
+                  setLocationLng(lng);
+                }}
+                disabled={submitting}
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
               <FileUpload
                 onFilesSelected={(files) => setSelectedFiles(Array.from(files))}

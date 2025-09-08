@@ -8,12 +8,15 @@ import { Navigation } from "@/components/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
+import { LocationPicker } from "@/components/LocationPicker";
 import { uploadFiles } from "@/utils/fileUpload";
+import { useAuth } from "@/hooks/useAuth";
 
 const categories = ["food", "toys", "accessories", "medicine", "services", "other"] as const;
 
 export default function MarketplaceNew() {
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<string>("");
@@ -21,6 +24,8 @@ export default function MarketplaceNew() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [locationLat, setLocationLat] = useState<number | null>(null);
+  const [locationLng, setLocationLng] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
@@ -55,10 +60,13 @@ export default function MarketplaceNew() {
         price: price ? Number(price) : null,
         images,
         location_text: location || null,
+        location_lat: locationLat,
+        location_lng: locationLng,
         contact_whatsapp: whatsapp || null,
         contact_email: email || null,
         store_contact: storeContact || null,
         status: "active",
+        user_id: user?.id,
       });
 
       if (error) throw error;
@@ -120,6 +128,16 @@ export default function MarketplaceNew() {
             <div>
               <label className="block text-sm font-medium mb-1">Descripción</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
+              <LocationPicker
+                onLocationChange={(lat, lng) => {
+                  setLocationLat(lat);
+                  setLocationLng(lng);
+                }}
+                disabled={submitting}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
