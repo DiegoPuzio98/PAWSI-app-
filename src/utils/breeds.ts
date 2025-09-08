@@ -48,7 +48,7 @@ export const breedsBySpecies = {
 export const allColors = [
   'Negro', 'Blanco', 'Marrón', 'Gris', 'Dorado', 'Rubio',
   'Rojizo', 'Naranja', 'Amarillo', 'Crema', 'Beige', 'Canela',
-  'Chocolate', 'Café', 'Plateado', 'Azul', 'Verde', 'Rosa',
+  'Chocolate', 'Café', 'Plateado',
   'Manchado', 'Rayado', 'Atigrado', 'Tricolor', 'Bicolor'
 ] as const;
 

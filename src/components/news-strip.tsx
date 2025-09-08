@@ -33,7 +33,7 @@ export const NewsStrip = () => {
           .select('id, title, location_text, created_at, species, images')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(3);
+          .limit(10);
 
         // Fetch latest reported posts
         const { data: reportedPosts } = await supabase
@@ -41,13 +41,13 @@ export const NewsStrip = () => {
           .select('id, title, location_text, created_at, species, images')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
-          .limit(3);
+          .limit(10);
 
         const combinedPosts: Post[] = [
           ...(lostPosts?.map(post => ({ ...post, type: 'lost' as const })) || []),
           ...(reportedPosts?.map(post => ({ ...post, type: 'reported' as const })) || [])
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-         .slice(0, 6);
+         .slice(0, 12);
 
         setPosts(combinedPosts);
       } catch (error) {
@@ -62,28 +62,28 @@ export const NewsStrip = () => {
 
   // Auto-scroll effect
   useEffect(() => {
-    if (!scrollRef.current || isPaused || posts.length === 0) return;
-    
+    if (!scrollRef.current || posts.length === 0) return;
+
     const scrollContainer = scrollRef.current;
-    let scrollAmount = 0;
-    const step = 0.5; // pixels per frame
-    const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-    
-    const scroll = () => {
-      if (isPaused) return;
-      
-      scrollAmount += step;
-      if (scrollAmount >= maxScroll) {
-        scrollAmount = 0; // Reset to beginning
+    let rafId: number;
+    const step = 0.8; // pixels per frame
+
+    const animate = () => {
+      if (!scrollContainer) return;
+
+      if (!isPaused) {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        if (maxScroll > 0) {
+          const next = scrollContainer.scrollLeft + step;
+          scrollContainer.scrollLeft = next >= maxScroll ? 0 : next;
+        }
       }
-      
-      scrollContainer.scrollLeft = scrollAmount;
-      requestAnimationFrame(scroll);
+
+      rafId = requestAnimationFrame(animate);
     };
-    
-    const animationId = requestAnimationFrame(scroll);
-    
-    return () => cancelAnimationFrame(animationId);
+
+    rafId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafId);
   }, [isPaused, posts]);
 
   if (loading) {
