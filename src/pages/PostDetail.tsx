@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ArrowLeft, Calendar, MapPin, Phone, MessageCircle, Mail } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Phone, MessageCircle, Mail, Flag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MapboxPreview } from "@/components/MapboxPreview";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { SensitiveImage } from "@/components/SensitiveImage";
+import { ReportDialog } from "@/components/ReportDialog";
 
 interface PostData {
   id: string;
@@ -53,6 +54,7 @@ export default function PostDetail() {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingContact, setLoadingContact] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -431,6 +433,18 @@ export default function PostDetail() {
             </div>
           </div>
         </Card>
+        <div className="fixed bottom-6 right-6 z-50">
+          <Button variant="destructive" onClick={() => setReportOpen(true)}>
+            <Flag className="h-4 w-4 mr-2" />
+            Reportar publicación
+          </Button>
+        </div>
+        <ReportDialog
+          open={reportOpen}
+          onOpenChange={setReportOpen}
+          postId={post.id}
+          postType={(type === 'classifieds' ? 'classified' : (type as any))}
+        />
       </div>
     </div>
   );

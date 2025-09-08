@@ -16,13 +16,9 @@ interface ReportDialogProps {
 }
 
 const reportReasons = [
-  { value: 'spam', label: 'Spam o contenido repetitivo' },
   { value: 'inappropriate', label: 'Contenido inapropiado' },
-  { value: 'fake', label: 'Información falsa' },
-  { value: 'animal_abuse', label: 'Posible maltrato animal' },
-  { value: 'commercial', label: 'Venta comercial no permitida' },
-  { value: 'personal_data', label: 'Exposición de datos personales' },
   { value: 'offensive', label: 'Contenido ofensivo' },
+  { value: 'personal_data', label: 'Exposición de datos personales' },
   { value: 'other', label: 'Otro motivo' }
 ];
 

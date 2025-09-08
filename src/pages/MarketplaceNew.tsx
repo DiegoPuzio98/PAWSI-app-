@@ -167,6 +167,7 @@ export default function MarketplaceNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">Área</label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Barrio / zona" />
+                <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
             </div>
             <div>

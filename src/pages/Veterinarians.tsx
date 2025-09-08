@@ -58,13 +58,9 @@ export default function Veterinarians() {
       .eq('status', 'active')
       .order('created_at', { ascending: false });
 
-    // Filter by user's location first if profile exists (include legacy posts without location)
-    if (userProfile?.country) {
-      const exact = userProfile.province
-        ? `and(country.eq.${userProfile.country},province.eq.${userProfile.province})`
-        : `country.eq.${userProfile.country}`;
-      const legacy = 'and(country.is.null,province.is.null)';
-      query = query.or(`${exact},${legacy}`);
+    // Filter by user's province strictly if available
+    if (userProfile?.province) {
+      query = query.eq('province', userProfile.province);
     }
 
     if (searchTerm) {

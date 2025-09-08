@@ -10,6 +10,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/components/ui/use-toast";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Mail, Lock, User, AlertCircle, MapPin } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
 
 export default function AuthPage() {
@@ -21,6 +23,8 @@ export default function AuthPage() {
   const [province, setProvince] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const { signIn, signUp } = useAuth();
   const { t } = useLanguage();
@@ -30,6 +34,12 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (isSignUp && !termsAccepted) {
+      setError('Debes aceptar los Términos y Condiciones para crear tu cuenta.');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isSignUp) {
