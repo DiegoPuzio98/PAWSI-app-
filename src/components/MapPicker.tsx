@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { Button } from "@/components/ui/button";
 import { Loader2, MapPin, X } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface MapPickerProps {
   onLocationChange: (lat: number | null, lng: number | null) => void;
@@ -13,84 +12,52 @@ interface MapPickerProps {
 
 export const MapPicker: React.FC<MapPickerProps> = ({ onLocationChange, disabled, height = 280 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [initializing, setInitializing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
-    const init = async () => {
+    const init = () => {
       try {
         setLoading(true);
         setError(null);
-        // Get Mapbox token from Edge Function
-        const { data, error } = await supabase.functions.invoke("get-mapbox-token", { body: {} });
-        if (error) throw error;
-        const token = (data as any)?.token as string | undefined;
-        if (!token) {
-          throw new Error("Mapbox token not configured. Please add it in Supabase Edge Function secrets.");
-        }
-        mapboxgl.accessToken = token;
 
         if (!containerRef.current || !isMounted) return;
-        setInitializing(true);
 
-        // Initialize map centered globally
-        mapRef.current = new mapboxgl.Map({
-          container: containerRef.current,
-          style: "mapbox://styles/mapbox/light-v11",
-          projection: "globe",
-          zoom: 2.2,
-          center: [0, 20],
-          pitch: 30,
+        // Fix for default markers in Leaflet
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+          iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+          iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+          shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
         });
 
-        // Controls
-        mapRef.current.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
-        const geolocate = new mapboxgl.GeolocateControl({
-          positionOptions: { enableHighAccuracy: true },
-          trackUserLocation: false,
-          showUserHeading: true,
-        });
-        mapRef.current.addControl(geolocate, "top-right");
+        // Initialize map
+        mapRef.current = L.map(containerRef.current).setView([20, 0], 2);
 
-        // When user clicks the geolocate button
-        geolocate.on("geolocate", (e: any) => {
-          const lat = e.coords.latitude as number;
-          const lng = e.coords.longitude as number;
-          placeMarker([lng, lat]);
-          onLocationChange(lat, lng);
-          mapRef.current?.flyTo({ center: [lng, lat], zoom: 14, speed: 1.2 });
-        });
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(mapRef.current);
 
         // Click to place marker
-        mapRef.current.on("click", (ev) => {
+        mapRef.current.on("click", (ev: L.LeafletMouseEvent) => {
           if (disabled) return;
-          const { lng, lat } = ev.lngLat;
-          placeMarker([lng, lat]);
+          const { lat, lng } = ev.latlng;
+          placeMarker([lat, lng]);
           onLocationChange(lat, lng);
         });
 
-        mapRef.current.on("style.load", () => {
-          mapRef.current?.setFog({
-            color: "rgb(255,255,255)",
-            "high-color": "rgb(200, 200, 225)",
-            "horizon-blend": 0.2,
-          } as any);
-        });
+        setLoading(false);
       } catch (err: any) {
         console.error("Map init error", err);
         if (!isMounted) return;
         setError(err?.message ?? "Error inicializando el mapa");
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-          setInitializing(false);
-        }
+        setLoading(false);
       }
     };
 
@@ -98,37 +65,58 @@ export const MapPicker: React.FC<MapPickerProps> = ({ onLocationChange, disabled
 
     return () => {
       isMounted = false;
-      mapRef.current?.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
   }, [onLocationChange, disabled]);
 
-  const placeMarker = (lngLat: [number, number]) => {
+  const placeMarker = (latLng: [number, number]) => {
     if (!mapRef.current) return;
-    if (markerRef.current) markerRef.current.remove();
-    markerRef.current = new mapboxgl.Marker({ color: "#ea580c" }) // semantic primary-ish
-      .setLngLat(lngLat)
-      .addTo(mapRef.current);
+    if (markerRef.current) {
+      mapRef.current.removeLayer(markerRef.current);
+    }
+    markerRef.current = L.marker(latLng).addTo(mapRef.current);
   };
 
   const clearLocation = () => {
-    markerRef.current?.remove();
+    if (markerRef.current && mapRef.current) {
+      mapRef.current.removeLayer(markerRef.current);
+    }
     markerRef.current = null;
     onLocationChange(null, null);
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      setLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          placeMarker([lat, lng]);
+          onLocationChange(lat, lng);
+          mapRef.current?.setView([lat, lng], 14);
+          setLoading(false);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setError("No se pudo obtener la ubicación actual");
+          setLoading(false);
+        }
+      );
+    } else {
+      setError("Geolocation no está soportado en este navegador");
+    }
   };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <Button type="button" variant="outline" size="sm" disabled={disabled || initializing || loading} onClick={() => {
-          // Trigger the GeolocateControl button programmatically
-          const buttons = containerRef.current?.parentElement?.querySelectorAll(
-            ".mapboxgl-ctrl-geolocate"
-          );
-          (buttons?.[0] as HTMLButtonElement | undefined)?.click();
-        }}>
-          {initializing || loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MapPin className="h-4 w-4 mr-2" />}
-          {initializing || loading ? "Cargando mapa..." : "Usar mi ubicación"}
+        <Button type="button" variant="outline" size="sm" disabled={disabled || loading} onClick={getCurrentLocation}>
+          {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MapPin className="h-4 w-4 mr-2" />}
+          {loading ? "Obteniendo ubicación..." : "Usar mi ubicación"}
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={clearLocation} disabled={disabled}>
           <X className="h-4 w-4 mr-1" /> Limpiar
