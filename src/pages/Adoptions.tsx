@@ -53,32 +53,34 @@ export default function Adoptions() {
   };
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
+
+  useEffect(() => {
     // Initialize from URL params once
     const q = searchParams.get('q');
     const sp = searchParams.get('species');
     if (q) setSearchTerm(q);
     if (sp) setSpeciesFilter(sp);
-    
-    // Load user profile for location filtering
-    if (user?.id) {
-      supabase
-        .from('profiles')
-        .select('country, province')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          setUserProfile(data);
-        });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     fetchPosts();
     if (user) {
       fetchHighlights();
     }
-  }, [searchTerm, speciesFilter, colorFilters, locationFilter, user]);
+  }, [searchTerm, speciesFilter, colorFilters, locationFilter, userProfile, user]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -86,6 +88,14 @@ export default function Adoptions() {
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
+
+    // Filter by user's location first if profile exists
+    if (userProfile?.country) {
+      query = query.eq('country', userProfile.country);
+      if (userProfile.province) {
+        query = query.eq('province', userProfile.province);
+      }
+    }
 
     if (searchTerm) {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);

@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Search, MapPin, Calendar, Plus, DollarSign, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Classified {
   id: string;
@@ -27,10 +28,12 @@ interface Classified {
 
 export default function Marketplace() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [classifieds, setClassifieds] = useState<Classified[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
 
   const categories = [
     { value: 'food', label: 'Comida' },
@@ -42,8 +45,22 @@ export default function Marketplace() {
   ];
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
+
+  useEffect(() => {
     fetchClassifieds();
-  }, [searchTerm, categoryFilter]);
+  }, [searchTerm, categoryFilter, userProfile]);
 
   const fetchClassifieds = async () => {
     let query = supabase
@@ -51,6 +68,14 @@ export default function Marketplace() {
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
+
+    // Filter by user's location first if profile exists
+    if (userProfile?.country) {
+      query = query.eq('country', userProfile.country);
+      if (userProfile.province) {
+        query = query.eq('province', userProfile.province);
+      }
+    }
 
     if (searchTerm) {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);

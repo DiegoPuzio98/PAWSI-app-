@@ -11,6 +11,7 @@ import { MapboxPreview } from "@/components/MapboxPreview";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SensitiveImage } from "@/components/SensitiveImage";
 
 interface PostData {
   id: string;
@@ -194,13 +195,14 @@ export default function PostDetail() {
                   {post.images.map((image, index) => (
                     <CarouselItem key={index}>
                       <div className="relative h-96 w-full overflow-hidden">
-                        <img
+                        <SensitiveImage
                           src={image.startsWith('http') 
                             ? image 
                             : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${image}`
                           }
                           alt={`${post.title} - Imagen ${index + 1}`}
                           className="w-full h-full object-cover"
+                          isSensitive={type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
                           onError={(e) => {
                             (e.target as HTMLImageElement).style.display = 'none';
                           }}

@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SensitiveImage } from "@/components/SensitiveImage";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Post {
   id: string;
@@ -14,47 +16,82 @@ interface Post {
   species?: string;
   images?: string[];
   type: 'lost' | 'reported' | 'adoption';
+  state?: string;
+  country?: string;
+  province?: string;
 }
 
 export const NewsStrip = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
 
   useEffect(() => {
     const fetchLatestPosts = async () => {
       try {
-        // Fetch latest lost posts
-        const { data: lostPosts } = await supabase
+        let lostQuery = supabase
           .from('lost_posts')
-          .select('id, title, location_text, created_at, species, images')
+          .select('id, title, location_text, created_at, species, images, country, province')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(8);
 
-        // Fetch latest reported posts
-        const { data: reportedPosts } = await supabase
+        let reportedQuery = supabase
           .from('reported_posts')
-          .select('id, title, location_text, created_at, species, images')
+          .select('id, title, location_text, created_at, species, images, state, country, province')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(8);
 
-        // Fetch latest adoption posts
-        const { data: adoptionPosts } = await supabase
+        let adoptionQuery = supabase
           .from('adoption_posts')
-          .select('id, title, location_text, created_at, species, images')
+          .select('id, title, location_text, created_at, species, images, country, province')
           .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(8);
+
+        // Filter by user's location if profile exists
+        if (userProfile?.country) {
+          lostQuery = lostQuery.eq('country', userProfile.country);
+          reportedQuery = reportedQuery.eq('country', userProfile.country);
+          adoptionQuery = adoptionQuery.eq('country', userProfile.country);
+
+          if (userProfile.province) {
+            lostQuery = lostQuery.eq('province', userProfile.province);
+            reportedQuery = reportedQuery.eq('province', userProfile.province);
+            adoptionQuery = adoptionQuery.eq('province', userProfile.province);
+          }
+        }
+
+        const [lostRes, reportedRes, adoptionRes] = await Promise.all([
+          lostQuery,
+          reportedQuery,
+          adoptionQuery
+        ]);
 
         const combinedPosts: Post[] = [
-          ...(lostPosts?.map(post => ({ ...post, type: 'lost' as const })) || []),
-          ...(reportedPosts?.map(post => ({ ...post, type: 'reported' as const })) || []),
-          ...(adoptionPosts?.map(post => ({ ...post, type: 'adoption' as const })) || [])
+          ...(lostRes.data?.map(post => ({ ...post, type: 'lost' as const })) || []),
+          ...(reportedRes.data?.map(post => ({ ...post, type: 'reported' as const })) || []),
+          ...(adoptionRes.data?.map(post => ({ ...post, type: 'adoption' as const })) || [])
         ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
          .slice(0, 15);
 
@@ -67,7 +104,7 @@ export const NewsStrip = () => {
     };
 
     fetchLatestPosts();
-  }, []);
+  }, [userProfile]);
 
   // Auto-scroll effect
   useEffect(() => {
@@ -134,13 +171,14 @@ export const NewsStrip = () => {
           >
             {post.images && post.images.length > 0 && (
               <div className="relative h-32 w-full overflow-hidden">
-                <img 
+                <SensitiveImage 
                   src={post.images[0].startsWith('http') 
                     ? post.images[0] 
                     : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
                   }
                   alt={post.title}
                   className="w-full h-full object-cover"
+                  isSensitive={post.type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}

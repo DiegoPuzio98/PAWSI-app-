@@ -22,6 +22,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
+          country: string | null
           created_at: string
           description: string | null
           id: string
@@ -30,6 +31,7 @@ export type Database = {
           location_lng: number | null
           location_text: string | null
           owner_secret_hash: string
+          province: string | null
           species: string | null
           status: string
           title: string
@@ -43,6 +45,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -51,6 +54,7 @@ export type Database = {
           location_lng?: number | null
           location_text?: string | null
           owner_secret_hash: string
+          province?: string | null
           species?: string | null
           status?: string
           title: string
@@ -64,6 +68,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -72,6 +77,7 @@ export type Database = {
           location_lng?: number | null
           location_text?: string | null
           owner_secret_hash?: string
+          province?: string | null
           species?: string | null
           status?: string
           title?: string
@@ -86,6 +92,7 @@ export type Database = {
           condition: string | null
           contact_email: string | null
           contact_whatsapp: string | null
+          country: string | null
           created_at: string
           description: string | null
           id: string
@@ -94,6 +101,7 @@ export type Database = {
           location_lng: number | null
           location_text: string | null
           price: number | null
+          province: string | null
           status: string
           store_contact: string | null
           title: string
@@ -104,6 +112,7 @@ export type Database = {
           condition?: string | null
           contact_email?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -112,6 +121,7 @@ export type Database = {
           location_lng?: number | null
           location_text?: string | null
           price?: number | null
+          province?: string | null
           status?: string
           store_contact?: string | null
           title: string
@@ -122,6 +132,7 @@ export type Database = {
           condition?: string | null
           contact_email?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -130,6 +141,7 @@ export type Database = {
           location_lng?: number | null
           location_text?: string | null
           price?: number | null
+          province?: string | null
           status?: string
           store_contact?: string | null
           title?: string
@@ -144,6 +156,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
+          country: string | null
           created_at: string
           description: string | null
           expires_at: string
@@ -154,6 +167,7 @@ export type Database = {
           location_text: string
           lost_at: string | null
           owner_secret_hash: string
+          province: string | null
           species: string | null
           status: string
           title: string
@@ -165,6 +179,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           expires_at?: string
@@ -175,6 +190,7 @@ export type Database = {
           location_text: string
           lost_at?: string | null
           owner_secret_hash: string
+          province?: string | null
           species?: string | null
           status?: string
           title: string
@@ -186,6 +202,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           expires_at?: string
@@ -196,6 +213,7 @@ export type Database = {
           location_text?: string
           lost_at?: string | null
           owner_secret_hash?: string
+          province?: string | null
           species?: string | null
           status?: string
           title?: string
@@ -279,6 +297,7 @@ export type Database = {
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
+          country: string | null
           created_at: string
           description: string | null
           expires_at: string | null
@@ -288,6 +307,7 @@ export type Database = {
           location_lng: number | null
           location_text: string
           owner_secret_hash: string | null
+          province: string | null
           seen_at: string | null
           species: string | null
           state: string
@@ -301,6 +321,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           expires_at?: string | null
@@ -310,6 +331,7 @@ export type Database = {
           location_lng?: number | null
           location_text: string
           owner_secret_hash?: string | null
+          province?: string | null
           seen_at?: string | null
           species?: string | null
           state: string
@@ -323,6 +345,7 @@ export type Database = {
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
+          country?: string | null
           created_at?: string
           description?: string | null
           expires_at?: string | null
@@ -332,6 +355,7 @@ export type Database = {
           location_lng?: number | null
           location_text?: string
           owner_secret_hash?: string | null
+          province?: string | null
           seen_at?: string | null
           species?: string | null
           state?: string
@@ -401,6 +425,7 @@ export type Database = {
       veterinarians: {
         Row: {
           address: string
+          country: string | null
           created_at: string
           description: string | null
           email: string | null
@@ -410,6 +435,7 @@ export type Database = {
           location_lng: number | null
           name: string
           phone: string | null
+          province: string | null
           services: string[] | null
           status: string
           updated_at: string
@@ -419,6 +445,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -428,6 +455,7 @@ export type Database = {
           location_lng?: number | null
           name: string
           phone?: string | null
+          province?: string | null
           services?: string[] | null
           status?: string
           updated_at?: string
@@ -437,6 +465,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          country?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -446,6 +475,7 @@ export type Database = {
           location_lng?: number | null
           name?: string
           phone?: string | null
+          province?: string | null
           services?: string[] | null
           status?: string
           updated_at?: string

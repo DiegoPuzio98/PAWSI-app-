@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, MapPin, Calendar, Plus, Phone, Globe, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Veterinarian {
   id: string;
@@ -26,13 +27,29 @@ interface Veterinarian {
 
 export default function Veterinarians() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [veterinarians, setVeterinarians] = useState<Veterinarian[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
 
   useEffect(() => {
     fetchVeterinarians();
-  }, [searchTerm]);
+  }, [searchTerm, userProfile]);
 
   const fetchVeterinarians = async () => {
     let query = supabase
@@ -40,6 +57,14 @@ export default function Veterinarians() {
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
+
+    // Filter by user's location first if profile exists
+    if (userProfile?.country) {
+      query = query.eq('country', userProfile.country);
+      if (userProfile.province) {
+        query = query.eq('province', userProfile.province);
+      }
+    }
 
     if (searchTerm) {
       query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,address.ilike.%${searchTerm}%`);

@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Plus } from "lucide-react";
 import { SensitiveImage } from "@/components/SensitiveImage";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ReportedPost {
   id: string;
@@ -44,6 +45,7 @@ const speciesKeyForI18n = (s?: string | null) => {
 
 export default function ReportedPets() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<ReportedPost[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,6 +54,7 @@ export default function ReportedPets() {
   const [breedFilter, setBreedFilter] = useState("");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
   const [searchParams] = useSearchParams();
 
   const statusKeyForI18n = (s?: string | null) => {
@@ -74,6 +77,20 @@ export default function ReportedPets() {
   };
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+        setUserProfile(data);
+      }
+    };
+    fetchUserProfile();
+  }, [user]);
+
+  useEffect(() => {
     // Initialize from URL params once
     const q = searchParams.get('q');
     const sp = searchParams.get('species');
@@ -84,7 +101,7 @@ export default function ReportedPets() {
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter, breedFilter, colorFilters, locationFilter]);
+  }, [searchTerm, speciesFilter, breedFilter, colorFilters, locationFilter, userProfile]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -92,6 +109,14 @@ export default function ReportedPets() {
       .select('*')
       .eq('status', 'active')
       .order('created_at', { ascending: false });
+
+    // Filter by user's location first if profile exists
+    if (userProfile?.country) {
+      query = query.eq('country', userProfile.country);
+      if (userProfile.province) {
+        query = query.eq('province', userProfile.province);
+      }
+    }
 
     if (searchTerm) {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);
