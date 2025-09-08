@@ -202,6 +202,7 @@ export type Database = {
           location_lat: number | null
           location_lng: number | null
           location_text: string
+          owner_secret_hash: string | null
           seen_at: string | null
           species: string | null
           state: string
@@ -221,6 +222,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_text: string
+          owner_secret_hash?: string | null
           seen_at?: string | null
           species?: string | null
           state: string
@@ -240,6 +242,7 @@ export type Database = {
           location_lat?: number | null
           location_lng?: number | null
           location_text?: string
+          owner_secret_hash?: string | null
           seen_at?: string | null
           species?: string | null
           state?: string
@@ -286,7 +289,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      resolve_post: {
+        Args: { owner_secret: string; post_id: string; post_type: string }
+        Returns: boolean
+      }
+      submit_report: {
+        Args: {
+          payload?: Json
+          post_id: string
+          post_type: string
+          reason: string
+          reason_code: string
+          suspended_by?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

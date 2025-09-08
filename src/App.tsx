@@ -13,6 +13,10 @@ import Marketplace from "./pages/Marketplace";
 import Adoptions from "./pages/Adoptions";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
+import ReportedNew from "./pages/ReportedNew";
+import LostNew from "./pages/LostNew";
+import MarketplaceNew from "./pages/MarketplaceNew";
+import AdoptionsNew from "./pages/AdoptionsNew";
 
 const queryClient = new QueryClient();
 
@@ -27,9 +31,13 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
             <Route path="/reported" element={<ReportedPets />} />
+            <Route path="/reported/new" element={<ReportedNew />} />
             <Route path="/lost" element={<LostPets />} />
+            <Route path="/lost/new" element={<LostNew />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/marketplace/new" element={<MarketplaceNew />} />
             <Route path="/adoptions" element={<Adoptions />} />
+            <Route path="/adoptions/new" element={<AdoptionsNew />} />
             <Route path="/support" element={<Support />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

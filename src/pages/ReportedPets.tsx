@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MapPin, Calendar, Plus } from "lucide-react";
+import { Search, MapPin, Calendar, Plus, Flag, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ReportedPost {
   id: string;
@@ -21,6 +22,7 @@ interface ReportedPost {
   contact_whatsapp?: string;
   contact_phone?: string;
   contact_email?: string;
+  status: string;
 }
 
 export default function ReportedPets() {
