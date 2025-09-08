@@ -450,8 +450,6 @@ export type Database = {
           description: string | null
           id: string | null
           images: string[] | null
-          location_lat: number | null
-          location_lng: number | null
           location_text: string | null
           price: number | null
           status: string | null
@@ -464,8 +462,6 @@ export type Database = {
           description?: string | null
           id?: string | null
           images?: string[] | null
-          location_lat?: number | null
-          location_lng?: number | null
           location_text?: string | null
           price?: number | null
           status?: string | null
@@ -478,8 +474,6 @@ export type Database = {
           description?: string | null
           id?: string | null
           images?: string[] | null
-          location_lat?: number | null
-          location_lng?: number | null
           location_text?: string | null
           price?: number | null
           status?: string | null
