@@ -130,6 +130,12 @@ export default function ReportedNew() {
 
       toast({ title: "¡Reporte publicado!", description: "Tu reporte se publicó correctamente." });
       window.location.href = "/reported";
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Error al publicar", description: e.message ?? "Inténtalo de nuevo" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

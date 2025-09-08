@@ -126,6 +126,12 @@ export default function LostNew() {
 
       toast({ title: "¡Alerta publicada!", description: "Tu alerta se publicó correctamente." });
       window.location.href = "/lost";
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: "Error al publicar", description: e.message ?? "Inténtalo de nuevo" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
