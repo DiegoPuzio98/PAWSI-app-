@@ -12,6 +12,7 @@ import { uploadFiles } from "@/utils/fileUpload";
 import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
+import { ConsentAlert } from "@/components/ConsentAlert";
 
 export default function VeterinariansNew() {
   const { toast } = useToast();
@@ -119,12 +120,14 @@ export default function VeterinariansNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">Teléfono</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Ej: +54911..." />
+                <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
             </div>
             
             <div>
               <label className="block text-sm font-medium mb-1">Dirección *</label>
               <Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Ej: Av. Corrientes 1234, CABA" />
+              <ConsentAlert fieldValue={address} fieldType="address" />
             </div>
             
             <div>
@@ -210,6 +213,7 @@ export default function VeterinariansNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">WhatsApp</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
+                <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>

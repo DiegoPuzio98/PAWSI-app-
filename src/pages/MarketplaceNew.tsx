@@ -12,6 +12,7 @@ import { MapboxPicker } from "@/components/MapboxPicker";
 import { LocationSelector } from "@/components/LocationSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useAuth } from "@/hooks/useAuth";
+import { ConsentAlert } from "@/components/ConsentAlert";
 
 const categories = [
   { value: 'food', label: 'Comida' },
@@ -206,6 +207,7 @@ export default function MarketplaceNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">WhatsApp</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
+                <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>

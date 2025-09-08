@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
 import { speciesList, normalizeSpecies } from "@/utils/species";
+import { ConsentAlert } from "@/components/ConsentAlert";
 
 export default function LostNew() {
   const { toast } = useToast();
@@ -218,6 +219,7 @@ export default function LostNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">Área aproximada *</label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Barrio / zona" />
+                <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Fecha/hora de pérdida</label>
@@ -283,10 +285,12 @@ export default function LostNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">WhatsApp</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
+                <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Teléfono</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>

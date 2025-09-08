@@ -21,6 +21,8 @@ const reportReasons = [
   { value: 'fake', label: 'Información falsa' },
   { value: 'animal_abuse', label: 'Posible maltrato animal' },
   { value: 'commercial', label: 'Venta comercial no permitida' },
+  { value: 'personal_data', label: 'Exposición de datos personales' },
+  { value: 'offensive', label: 'Contenido ofensivo' },
   { value: 'other', label: 'Otro motivo' }
 ];
 
@@ -37,8 +39,30 @@ export function ReportDialog({ open, onOpenChange, postId, postType }: ReportDia
       return;
     }
 
+    if (reason === 'other' && !description) {
+      toast({ title: "Error", description: "Proporciona una descripción para 'Otro motivo'" });
+      return;
+    }
+
     setSubmitting(true);
     try {
+      // Send email report
+      const reportResponse = await supabase.functions.invoke('send-post-report', {
+        body: {
+          postId,
+          postType,
+          reason,
+          description: description || null,
+          reporterEmail: user?.email || null
+        }
+      });
+
+      if (reportResponse.error) {
+        console.error('Email report error:', reportResponse.error);
+        // Continue with database report even if email fails
+      }
+
+      // Also save to database for record-keeping
       const { error } = await supabase
         .from('post_reports')
         .insert({
@@ -91,12 +115,15 @@ export function ReportDialog({ open, onOpenChange, postId, postType }: ReportDia
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Descripción (opcional)</label>
+            <label className="block text-sm font-medium mb-2">
+              Descripción {reason === 'other' ? '(requerida)' : '(opcional)'}
+            </label>
             <Textarea
-              placeholder="Proporciona más detalles sobre el problema..."
+              placeholder={reason === 'other' ? "Explica el motivo del reporte..." : "Proporciona más detalles sobre el problema..."}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
+              required={reason === 'other'}
             />
           </div>
 

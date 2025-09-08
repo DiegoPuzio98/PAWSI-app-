@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
 import { speciesList, normalizeSpecies } from "@/utils/species";
+import { ConsentAlert } from "@/components/ConsentAlert";
 
 export default function AdoptionsNew() {
   const { toast } = useToast();
@@ -237,10 +238,12 @@ export default function AdoptionsNew() {
               <div>
                 <label className="block text-sm font-medium mb-1">WhatsApp</label>
                 <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54911..." />
+                <ConsentAlert fieldValue={whatsapp} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Teléfono</label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <ConsentAlert fieldValue={phone} fieldType="phone" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Email</label>
