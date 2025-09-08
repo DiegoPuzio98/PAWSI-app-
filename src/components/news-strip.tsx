@@ -111,7 +111,7 @@ export const NewsStrip = () => {
       <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
       <div 
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+        className="flex gap-3 overflow-hidden pb-2"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={() => setIsPaused(true)}

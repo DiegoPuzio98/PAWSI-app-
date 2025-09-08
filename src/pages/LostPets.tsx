@@ -37,6 +37,17 @@ export default function LostPets() {
   const [locationFilter, setLocationFilter] = useState("");
   const [searchParams] = useSearchParams();
 
+  const speciesKeyForI18n = (s?: string | null) => {
+    switch (s) {
+      case 'dog': return 'dogs';
+      case 'cat': return 'cats';
+      case 'bird': return 'birds';
+      case 'rodent': return 'rodents';
+      case 'fish': return 'fish';
+      default: return s || '';
+    }
+  };
+
   const handleResetFilters = () => {
     setSearchTerm("");
     setSpeciesFilter("all");
@@ -150,7 +161,7 @@ export default function LostPets() {
                   <div className="flex flex-col items-end gap-1">
                     {post.species && (
                       <span className="text-xs bg-destructive/10 text-destructive px-2 py-1 rounded">
-                        {t(`species.${post.species}`)}
+                        {t(`species.${speciesKeyForI18n(post.species)}`)}
                       </span>
                     )}
                     {isExpiringSoon(post.expires_at) && (

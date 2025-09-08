@@ -114,7 +114,8 @@ export default function Dashboard() {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.id.includes(searchTerm);
     const matchesTab = activeTab === 'all' || post.type === activeTab;
-    return matchesSearch && matchesTab;
+    const notResolved = post.status !== 'resolved';
+    return matchesSearch && matchesTab && notResolved;
   });
 
   const getStatusColor = (status: string) => {

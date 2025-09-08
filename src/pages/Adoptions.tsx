@@ -40,6 +40,17 @@ export default function Adoptions() {
   const [searchParams] = useSearchParams();
   const [highlights, setHighlights] = useState<Set<string>>(new Set());
 
+  const speciesKeyForI18n = (s?: string | null) => {
+    switch (s) {
+      case 'dog': return 'dogs';
+      case 'cat': return 'cats';
+      case 'bird': return 'birds';
+      case 'rodent': return 'rodents';
+      case 'fish': return 'fish';
+      default: return s || '';
+    }
+  };
+
   useEffect(() => {
     // Initialize from URL params once
     const q = searchParams.get('q');
@@ -169,7 +180,7 @@ export default function Adoptions() {
                     <Heart className="h-4 w-4 text-primary" />
                     {post.species && (
                       <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                        {t(`species.${post.species}`)}
+                        {t(`species.${speciesKeyForI18n(post.species)}`)}
                       </span>
                     )}
                   </div>

@@ -204,16 +204,26 @@ export default function PostDetail() {
                   {getTypeLabel()}
                 </Badge>
               </div>
+              {type === 'reported' && post.state && (
+                <div className="absolute top-4 right-4">
+                  <Badge>
+                    {t(`status.${post.state}`)}
+                  </Badge>
+                </div>
+              )}
             </div>
           )}
 
           <div className="p-6">
             {/* Header without image */}
             {(!post.images || post.images.length === 0) && (
-              <div className="mb-4">
+              <div className="mb-4 flex items-center gap-2">
                 <Badge variant={getTypeVariant() as any} className="mb-2">
                   {getTypeLabel()}
                 </Badge>
+                {type === 'reported' && post.state && (
+                  <Badge className="mb-2">{t(`status.${post.state}`)}</Badge>
+                )}
               </div>
             )}
 
@@ -264,6 +274,18 @@ export default function PostDetail() {
                 </div>
               )}
             </div>
+
+            {/* Colors */}
+            {(post as any).colors && (post as any).colors.length > 0 && (
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold mb-2">Colores</h2>
+                <div className="flex flex-wrap gap-2">
+                  {(post as any).colors.map((c: string) => (
+                    <Badge key={c} variant="secondary" className="text-xs">{c}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             {post.description && (

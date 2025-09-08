@@ -57,9 +57,9 @@ const Index = () => {
                 <SelectValue placeholder="Categoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="reported">Reportados</SelectItem>
-                <SelectItem value="lost">Perdidos</SelectItem>
-                <SelectItem value="adoptions">Adopciones</SelectItem>
+                <SelectItem value="reported">{t('nav.reported')}</SelectItem>
+                <SelectItem value="lost">{t('nav.lost')}</SelectItem>
+                <SelectItem value="adoptions">{t('nav.adoptions')}</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={handleSearch}>Buscar</Button>
@@ -104,13 +104,13 @@ const Index = () => {
           <Link to="/reported">
             <Button variant="secondary" className="w-full h-16 flex flex-col gap-1">
               <Camera className="h-5 w-5" />
-              <span className="text-sm">Mascotas Reportadas</span>
+              <span className="text-sm">{t('nav.reported')}</span>
             </Button>
           </Link>
           <Link to="/lost">
             <Button variant="secondary" className="w-full h-16 flex flex-col gap-1">
               <AlertTriangle className="h-5 w-5" />
-              <span className="text-sm">Mascotas Perdidas</span>
+              <span className="text-sm">{t('nav.lost')}</span>
             </Button>
           </Link>
         </div>

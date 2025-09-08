@@ -94,8 +94,8 @@ export default function AdoptionsNew() {
 
       if (error) throw error;
 
-      setSecret(s);
-      toast({ title: "¡Publicación creada!", description: "Guarda tu código secreto para gestionar la publicación." });
+      toast({ title: "¡Publicación creada!", description: "Tu publicación se creó correctamente." });
+      window.location.href = "/adoptions";
     } catch (e: any) {
       console.error(e);
       toast({ title: "Error al publicar", description: e.message ?? "Inténtalo de nuevo" });
@@ -127,7 +127,7 @@ export default function AdoptionsNew() {
                     <SelectValue placeholder="Especie" />
                   </SelectTrigger>
                   <SelectContent>
-                    {speciesList.map((s) => (
+                    {speciesList.filter(s => s !== 'fish').map((s) => (
                       <SelectItem key={s} value={s}>{t(`species.${s}`)}</SelectItem>
                     ))}
                   </SelectContent>
@@ -209,21 +209,7 @@ export default function AdoptionsNew() {
           </CardContent>
         </Card>
 
-        <Dialog open={!!secret} onOpenChange={() => setSecret(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Guarda este código secreto</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2">
-              <p>Código para gestionar tu publicación:</p>
-              <p className="text-2xl font-bold text-primary select-all">{secret}</p>
-              <p className="text-sm text-muted-foreground">No podremos recuperarlo si lo pierdes.</p>
-            </div>
-            <DialogFooter>
-              <Button onClick={() => (window.location.href = "/adoptions")}>Ir a adopciones</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        {/* Se eliminó el diálogo de código secreto por solicitud del usuario */}
       </main>
     </div>
   );
