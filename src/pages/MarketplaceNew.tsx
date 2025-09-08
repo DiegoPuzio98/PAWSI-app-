@@ -38,6 +38,10 @@ export default function MarketplaceNew() {
       toast({ title: "Faltan campos obligatorios", description: "Título y categoría son requeridos" });
       return;
     }
+    if (!user) {
+      toast({ title: "Inicia sesión", description: "Debes iniciar sesión para publicar." });
+      return;
+    }
     setSubmitting(true);
     try {
       // Upload files if any

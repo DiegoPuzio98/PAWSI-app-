@@ -6,24 +6,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MapPin, Calendar, Plus, Flag, CheckCircle2 } from "lucide-react";
+import { Search, MapPin, Calendar, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { MapPreview } from "@/components/MapPreview";
 
 interface ReportedPost {
   id: string;
   title: string;
-  species: string;
-  breed: string;
-  description: string;
+  species: string | null;
+  breed: string | null;
+  description: string | null;
   location_text: string;
+  location_lat?: number | null;
+  location_lng?: number | null;
   images: string[];
   created_at: string;
-  contact_whatsapp?: string;
-  contact_phone?: string;
-  contact_email?: string;
+  contact_whatsapp?: string | null;
+  contact_phone?: string | null;
+  contact_email?: string | null;
   status: string;
 }
+
+const speciesKeyForI18n = (s?: string | null) => {
+  switch (s) {
+    case 'dog': return 'dogs';
+    case 'cat': return 'cats';
+    case 'bird': return 'birds';
+    case 'rodent': return 'rodents';
+    case 'fish': return 'fish';
+    default: return s || '';
+  }
+};
 
 export default function ReportedPets() {
   const { t } = useLanguage();
@@ -32,7 +46,15 @@ export default function ReportedPets() {
   const [searchTerm, setSearchTerm] = useState("");
   const [speciesFilter, setSpeciesFilter] = useState("");
 
-  const species = ['dogs', 'cats', 'birds', 'rodents', 'fish'];
+  const [selected, setSelected] = useState<ReportedPost | null>(null);
+
+  const speciesFilterOptions = [
+    { value: 'dog', labelKey: 'species.dogs' },
+    { value: 'cat', labelKey: 'species.cats' },
+    { value: 'bird', labelKey: 'species.birds' },
+    { value: 'rodent', labelKey: 'species.rodents' },
+    { value: 'fish', labelKey: 'species.fish' },
+  ];
 
   useEffect(() => {
     fetchPosts();
@@ -97,9 +119,9 @@ export default function ReportedPets() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas las especies</SelectItem>
-              {species.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {t(`species.${s}`)}
+              {speciesFilterOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {t(opt.labelKey)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -109,7 +131,7 @@ export default function ReportedPets() {
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden">
+            <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => setSelected(post)}>
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img 
@@ -124,7 +146,7 @@ export default function ReportedPets() {
                   <h3 className="font-semibold text-lg">{post.title}</h3>
                   {post.species && (
                     <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                      {t(`species.${post.species}`)}
+                      {t(`species.${speciesKeyForI18n(post.species)}`)}
                     </span>
                   )}
                 </div>

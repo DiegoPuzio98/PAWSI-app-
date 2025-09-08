@@ -16,6 +16,22 @@ import { useAuth } from "@/hooks/useAuth";
 import bcrypt from "bcryptjs";
 
 const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
+const normalizeSpecies = (value?: string | null) => {
+  if (!value) return null;
+  const map: Record<string, string> = {
+    dogs: "dog",
+    cats: "cat",
+    birds: "bird",
+    rodents: "rodent",
+    fish: "fish",
+    dog: "dog",
+    cat: "cat",
+    bird: "bird",
+    rodent: "rodent",
+  };
+  const key = value.trim().toLowerCase();
+  return (map[key] ?? null) as string | null;
+};
 
 export default function AdoptionsNew() {
   const { toast } = useToast();
@@ -49,6 +65,10 @@ export default function AdoptionsNew() {
       toast({ title: "Faltan campos obligatorios", description: "Título es requerido" });
       return;
     }
+    if (!user) {
+      toast({ title: "Inicia sesión", description: "Debes iniciar sesión para publicar." });
+      return;
+    }
     setSubmitting(true);
     try {
       const s = genSecret();
@@ -68,7 +88,7 @@ export default function AdoptionsNew() {
 
       const { error } = await supabase.from("adoption_posts").insert({
         title,
-        species: species || null,
+        species: normalizeSpecies(species),
         breed: breed || null,
         age: age || null,
         description: description || null,
