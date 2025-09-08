@@ -48,7 +48,7 @@ export default function Adoptions() {
       query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%`);
     }
 
-    if (speciesFilter) {
+    if (speciesFilter && speciesFilter !== 'all') {
       query = query.eq('species', speciesFilter);
     }
 
@@ -95,7 +95,7 @@ export default function Adoptions() {
               <SelectValue placeholder={t('form.species')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todas las especies</SelectItem>
+              <SelectItem value="all">Todas las especies</SelectItem>
               {species.map((s) => (
                 <SelectItem key={s} value={s}>
                   {t(`species.${s}`)}
