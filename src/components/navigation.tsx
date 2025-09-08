@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Phone, LogOut, User, Settings, Bookmark } from "lucide-react";
+import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Stethoscope, Phone, LogOut, User, Settings, Bookmark } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -21,6 +21,7 @@ export const Navigation = () => {
     { icon: Camera, label: t('nav.reported'), path: "/reported" },
     { icon: AlertTriangle, label: t('nav.lost'), path: "/lost" },
     { icon: ShoppingCart, label: t('nav.marketplace'), path: "/marketplace" },
+    { icon: Stethoscope, label: t('nav.veterinarians'), path: "/veterinarians" },
     { icon: Heart, label: t('nav.adoptions'), path: "/adoptions" },
     { icon: Phone, label: t('nav.support'), path: "/support" },
   ];

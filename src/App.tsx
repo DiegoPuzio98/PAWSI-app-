@@ -13,12 +13,14 @@ import Profile from "./pages/Profile";
 import ReportedPets from "./pages/ReportedPets";
 import LostPets from "./pages/LostPets";
 import Marketplace from "./pages/Marketplace";
+import Veterinarians from "./pages/Veterinarians";
 import Adoptions from "./pages/Adoptions";
 import Support from "./pages/Support";
 import NotFound from "./pages/NotFound";
 import ReportedNew from "./pages/ReportedNew";
 import LostNew from "./pages/LostNew";
 import MarketplaceNew from "./pages/MarketplaceNew";
+import VeterinariansNew from "./pages/VeterinariansNew";
 import AdoptionsNew from "./pages/AdoptionsNew";
 import PostDetail from "./pages/PostDetail";
 import Saved from "./pages/Saved";
@@ -44,6 +46,8 @@ const App = () => (
               <Route path="/lost/new" element={<AuthGuard requireAuth={true}><LostNew /></AuthGuard>} />
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/marketplace/new" element={<AuthGuard requireAuth={true}><MarketplaceNew /></AuthGuard>} />
+              <Route path="/veterinarians" element={<Veterinarians />} />
+              <Route path="/veterinarians/new" element={<AuthGuard requireAuth={true}><VeterinariansNew /></AuthGuard>} />
               <Route path="/adoptions" element={<Adoptions />} />
               <Route path="/adoptions/new" element={<AuthGuard requireAuth={true}><AdoptionsNew /></AuthGuard>} />
               <Route path="/support" element={<Support />} />

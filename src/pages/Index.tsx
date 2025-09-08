@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { NewsStrip } from "@/components/news-strip";
-import { Camera, AlertTriangle, Heart, ShoppingCart, Search } from "lucide-react";
+import { Camera, AlertTriangle, Heart, ShoppingCart, Stethoscope, Search } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -116,7 +116,7 @@ const Index = () => {
         </div>
 
         {/* Other Services */}
-        <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <Link to="/adoptions">
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
               <Heart className="h-5 w-5" />
@@ -127,6 +127,12 @@ const Index = () => {
             <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
               <ShoppingCart className="h-5 w-5" />
               <span className="text-sm">{t('home.buySell')}</span>
+            </Button>
+          </Link>
+          <Link to="/veterinarians">
+            <Button variant="outline" className="w-full h-16 flex flex-col gap-1">
+              <Stethoscope className="h-5 w-5" />
+              <span className="text-sm">{t('nav.veterinarians')}</span>
             </Button>
           </Link>
         </div>

@@ -392,6 +392,63 @@ export type Database = {
         }
         Relationships: []
       }
+      veterinarians: {
+        Row: {
+          address: string
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          images: string[] | null
+          location_lat: number | null
+          location_lng: number | null
+          name: string
+          phone: string | null
+          services: string[] | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          website: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          name: string
+          phone?: string | null
+          services?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          images?: string[] | null
+          location_lat?: number | null
+          location_lng?: number | null
+          name?: string
+          phone?: string | null
+          services?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          website?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
