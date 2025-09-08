@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { FileUpload } from "@/components/ui/file-upload";
+import { uploadFiles } from "@/utils/fileUpload";
 import bcrypt from "bcryptjs";
 
 const speciesList = ["dogs", "cats", "birds", "rodents", "fish"] as const;
@@ -22,7 +24,7 @@ export default function ReportedNew() {
   const [breed, setBreed] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [imagesText, setImagesText] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -46,10 +48,18 @@ export default function ReportedNew() {
     try {
       const s = genSecret();
       const owner_secret_hash = await bcrypt.hash(s, 10);
-      const images = imagesText
-        .split(/\n|,/) // new lines or commas
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+      
+      // Upload files if any
+      let images: string[] = [];
+      if (selectedFiles.length > 0) {
+        try {
+          images = await uploadFiles(selectedFiles as any);
+        } catch (uploadError: any) {
+          toast({ title: "Error al subir fotos", description: uploadError.message });
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const { error } = await supabase.from("reported_posts").insert({
         title,
@@ -136,8 +146,17 @@ export default function ReportedNew() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos (URLs, una por línea)</label>
-              <Textarea value={imagesText} onChange={(e) => setImagesText(e.target.value)} rows={4} placeholder="https://...\nhttps://..." />
+              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <FileUpload
+                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                onFileRemove={(index) => {
+                  const newFiles = [...selectedFiles];
+                  newFiles.splice(index, 1);
+                  setSelectedFiles(newFiles);
+                }}
+                selectedFiles={selectedFiles}
+                disabled={submitting}
+              />
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>

@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Navigation } from "@/components/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { FileUpload } from "@/components/ui/file-upload";
+import { uploadFiles } from "@/utils/fileUpload";
 
 const categories = ["food", "toys", "accessories", "medicine", "services", "other"] as const;
 
@@ -19,7 +21,7 @@ export default function MarketplaceNew() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
-  const [imagesText, setImagesText] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [storeContact, setStoreContact] = useState("");
@@ -33,10 +35,17 @@ export default function MarketplaceNew() {
     }
     setSubmitting(true);
     try {
-      const images = imagesText
-        .split(/\n|,/) 
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+      // Upload files if any
+      let images: string[] = [];
+      if (selectedFiles.length > 0) {
+        try {
+          images = await uploadFiles(selectedFiles as any);
+        } catch (uploadError: any) {
+          toast({ title: "Error al subir fotos", description: uploadError.message });
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const { error } = await supabase.from("classifieds").insert({
         title,
@@ -113,8 +122,17 @@ export default function MarketplaceNew() {
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Fotos (URLs, una por línea)</label>
-              <Textarea value={imagesText} onChange={(e) => setImagesText(e.target.value)} rows={4} placeholder="https://...\nhttps://..." />
+              <label className="block text-sm font-medium mb-1">Fotos</label>
+              <FileUpload
+                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                onFileRemove={(index) => {
+                  const newFiles = [...selectedFiles];
+                  newFiles.splice(index, 1);
+                  setSelectedFiles(newFiles);
+                }}
+                selectedFiles={selectedFiles}
+                disabled={submitting}
+              />
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>

@@ -79,7 +79,7 @@ export const NewsStrip = () => {
                 {post.type === 'lost' ? t('status.lost') : t('status.reported')}
               </Badge>
               {post.species && (
-                <Badge variant="outline">{post.species}</Badge>
+                <Badge variant="outline">{t(`species.${post.species}`)}</Badge>
               )}
             </div>
             <h3 className="font-medium text-sm mb-2 line-clamp-2">{post.title}</h3>
