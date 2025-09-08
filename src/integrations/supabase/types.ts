@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           age: string | null
           breed: string | null
+          colors: string[] | null
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
@@ -38,6 +39,7 @@ export type Database = {
         Insert: {
           age?: string | null
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -58,6 +60,7 @@ export type Database = {
         Update: {
           age?: string | null
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -137,6 +140,7 @@ export type Database = {
       lost_posts: {
         Row: {
           breed: string | null
+          colors: string[] | null
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
@@ -157,6 +161,7 @@ export type Database = {
         }
         Insert: {
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -177,6 +182,7 @@ export type Database = {
         }
         Update: {
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -194,6 +200,45 @@ export type Database = {
           status?: string
           title?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      post_reports: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          post_id: string
+          post_type: string
+          reason: string
+          reporter_user_id: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          post_id: string
+          post_type: string
+          reason: string
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          post_id?: string
+          post_type?: string
+          reason?: string
+          reporter_user_id?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -224,6 +269,7 @@ export type Database = {
       reported_posts: {
         Row: {
           breed: string | null
+          colors: string[] | null
           contact_email: string | null
           contact_phone: string | null
           contact_whatsapp: string | null
@@ -245,6 +291,7 @@ export type Database = {
         }
         Insert: {
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -266,6 +313,7 @@ export type Database = {
         }
         Update: {
           breed?: string | null
+          colors?: string[] | null
           contact_email?: string | null
           contact_phone?: string | null
           contact_whatsapp?: string | null
@@ -320,12 +368,37 @@ export type Database = {
         }
         Relationships: []
       }
+      user_highlights: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          post_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          post_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          post_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       adoption_posts_public: {
         Row: {
           age: string | null
           breed: string | null
+          colors: string[] | null
           created_at: string | null
           description: string | null
           id: string | null
@@ -340,6 +413,7 @@ export type Database = {
         Insert: {
           age?: string | null
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -354,6 +428,7 @@ export type Database = {
         Update: {
           age?: string | null
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -415,6 +490,7 @@ export type Database = {
       lost_posts_public: {
         Row: {
           breed: string | null
+          colors: string[] | null
           created_at: string | null
           description: string | null
           id: string | null
@@ -429,6 +505,7 @@ export type Database = {
         }
         Insert: {
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -443,6 +520,7 @@ export type Database = {
         }
         Update: {
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -460,6 +538,7 @@ export type Database = {
       reported_posts_public: {
         Row: {
           breed: string | null
+          colors: string[] | null
           created_at: string | null
           description: string | null
           id: string | null
@@ -475,6 +554,7 @@ export type Database = {
         }
         Insert: {
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -490,6 +570,7 @@ export type Database = {
         }
         Update: {
           breed?: string | null
+          colors?: string[] | null
           created_at?: string | null
           description?: string | null
           id?: string | null
