@@ -69,17 +69,11 @@ export const NewsStrip = () => {
           .order('created_at', { ascending: false })
           .limit(8);
 
-        // Filter by user's location if profile exists (include legacy posts without location)
-        if (userProfile?.country) {
-          const exact = userProfile.province
-            ? `and(country.eq.${userProfile.country},province.eq.${userProfile.province})`
-            : `country.eq.${userProfile.country}`;
-          const legacy = 'and(country.is.null,province.is.null)';
-          const orFilter = `${exact},${legacy}`;
-
-          lostQuery = lostQuery.or(orFilter);
-          reportedQuery = reportedQuery.or(orFilter);
-          adoptionQuery = adoptionQuery.or(orFilter);
+        // Filter strictly by user's province if available
+        if (userProfile?.province) {
+          lostQuery = lostQuery.eq('province', userProfile.province);
+          reportedQuery = reportedQuery.eq('province', userProfile.province);
+          adoptionQuery = adoptionQuery.eq('province', userProfile.province);
         }
 
         const [lostRes, reportedRes, adoptionRes] = await Promise.all([
@@ -179,7 +173,6 @@ export const NewsStrip = () => {
                   alt={post.title}
                   className="w-full h-full object-cover"
                   isSensitive={post.type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
-                  disableReveal={post.type === 'reported' && (post.state === 'injured' || post.state === 'sick')}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}

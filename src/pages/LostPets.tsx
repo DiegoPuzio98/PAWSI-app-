@@ -88,7 +88,6 @@ export default function LostPets() {
       .from('lost_posts')
       .select('*')
       .eq('status', 'active')
-      .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
 
     // Filter by user's province strictly if available
