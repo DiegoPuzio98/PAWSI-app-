@@ -83,11 +83,11 @@ export default function ReportedNew() {
       const s = genSecret();
       const owner_secret_hash = await bcrypt.hash(s, 10);
       
-      // Upload files if any
+      // Upload files if any (limit 3)
       let images: string[] = [];
       if (selectedFiles.length > 0) {
         try {
-          images = await uploadFiles(selectedFiles as any);
+          images = await uploadFiles(selectedFiles.slice(0, 3) as any);
         } catch (uploadError: any) {
           toast({ title: "Error al subir fotos", description: uploadError.message });
           setSubmitting(false);
@@ -229,16 +229,25 @@ export default function ReportedNew() {
                   <p className="text-sm text-muted-foreground">Las fotos están deshabilitadas para reportes de animales fallecidos</p>
                 </div>
               ) : (
-                <FileUpload
-                  onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
-                  onFileRemove={(index) => {
-                    const newFiles = [...selectedFiles];
-                    newFiles.splice(index, 1);
-                    setSelectedFiles(newFiles);
-                  }}
-                  selectedFiles={selectedFiles}
-                  disabled={submitting}
-                />
+                <>
+                  <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
+                  <FileUpload
+                    onFilesSelected={(files) => {
+                      const incoming = Array.from(files);
+                      if (incoming.length > 3) {
+                        toast({ title: "Límite de fotos", description: "Solo puedes subir hasta 3 fotos." });
+                      }
+                      setSelectedFiles(incoming.slice(0, 3));
+                    }}
+                    onFileRemove={(index) => {
+                      const newFiles = [...selectedFiles];
+                      newFiles.splice(index, 1);
+                      setSelectedFiles(newFiles);
+                    }}
+                    selectedFiles={selectedFiles}
+                    disabled={submitting}
+                  />
+                </>
               )}
             </div>
             <div className="grid md:grid-cols-3 gap-4">

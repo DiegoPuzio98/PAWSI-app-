@@ -90,20 +90,22 @@ export default function Dashboard() {
   const updatePostStatus = async (postId: string, postType: string, newStatus: string) => {
     try {
       let error;
+      // Some tables may restrict certain status values. For reported_posts, map "resolved" to "inactive" to avoid constraint issues.
+      const newStatusAdjusted = (postType === 'reported' && newStatus === 'resolved') ? 'inactive' : newStatus;
       
       if (postType === 'adoption') {
-        ({ error } = await supabase.from('adoption_posts').update({ status: newStatus }).eq('id', postId));
+        ({ error } = await supabase.from('adoption_posts').update({ status: newStatusAdjusted }).eq('id', postId));
       } else if (postType === 'lost') {
-        ({ error } = await supabase.from('lost_posts').update({ status: newStatus }).eq('id', postId));
+        ({ error } = await supabase.from('lost_posts').update({ status: newStatusAdjusted }).eq('id', postId));
       } else if (postType === 'reported') {
-        ({ error } = await supabase.from('reported_posts').update({ status: newStatus }).eq('id', postId));
+        ({ error } = await supabase.from('reported_posts').update({ status: newStatusAdjusted }).eq('id', postId));
       } else if (postType === 'classified') {
-        ({ error } = await supabase.from('classifieds').update({ status: newStatus }).eq('id', postId));
+        ({ error } = await supabase.from('classifieds').update({ status: newStatusAdjusted }).eq('id', postId));
       }
       
       if (error) throw error;
       
-      setPosts(posts.map(p => p.id === postId ? { ...p, status: newStatus } : p));
+      setPosts(posts.map(p => p.id === postId ? { ...p, status: newStatusAdjusted } : p));
       toast({ title: "¡Actualizado!", description: "Estado actualizado correctamente" });
     } catch (error: any) {
       toast({ title: "Error", description: error.message || "No se pudo actualizar el estado" });
@@ -114,8 +116,8 @@ export default function Dashboard() {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.id.includes(searchTerm);
     const matchesTab = activeTab === 'all' || post.type === activeTab;
-    const notResolved = post.status !== 'resolved';
-    return matchesSearch && matchesTab && notResolved;
+    const notClosed = post.status !== 'resolved' && post.status !== 'inactive';
+    return matchesSearch && matchesTab && notClosed;
   });
 
   const getStatusColor = (status: string) => {
@@ -194,7 +196,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-blue-600">
-                {posts.filter(p => p.status === 'resolved').length}
+                {posts.filter(p => p.status === 'resolved' || (p.type === 'reported' && p.status === 'inactive')).length}
               </div>
             </CardContent>
           </Card>

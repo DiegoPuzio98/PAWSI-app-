@@ -51,11 +51,11 @@ export default function MarketplaceNew() {
     }
     setSubmitting(true);
     try {
-      // Upload files if any
+      // Upload files if any (limit 3)
       let images: string[] = [];
       if (selectedFiles.length > 0) {
         try {
-          images = await uploadFiles(selectedFiles as any);
+          images = await uploadFiles(selectedFiles.slice(0, 3) as any);
         } catch (uploadError: any) {
           toast({ title: "Error al subir fotos", description: uploadError.message });
           setSubmitting(false);
@@ -152,8 +152,15 @@ export default function MarketplaceNew() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
+              <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
               <FileUpload
-                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                onFilesSelected={(files) => {
+                  const incoming = Array.from(files);
+                  if (incoming.length > 3) {
+                    toast({ title: "Límite de fotos", description: "Solo puedes subir hasta 3 fotos." });
+                  }
+                  setSelectedFiles(incoming.slice(0, 3));
+                }}
                 onFileRemove={(index) => {
                   const newFiles = [...selectedFiles];
                   newFiles.splice(index, 1);

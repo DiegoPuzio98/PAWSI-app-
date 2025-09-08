@@ -61,11 +61,11 @@ export default function AdoptionsNew() {
       const s = genSecret();
       const owner_secret_hash = await bcrypt.hash(s, 10);
       
-      // Upload files if any
+      // Upload files if any (limit 3)
       let images: string[] = [];
       if (selectedFiles.length > 0) {
         try {
-          images = await uploadFiles(selectedFiles as any);
+          images = await uploadFiles(selectedFiles.slice(0, 3) as any);
         } catch (uploadError: any) {
           toast({ title: "Error al subir fotos", description: uploadError.message });
           setSubmitting(false);
@@ -73,9 +73,16 @@ export default function AdoptionsNew() {
         }
       }
 
+      const normalizedSpecies = normalizeSpecies(species);
+      if (normalizedSpecies === 'fish') {
+        toast({ title: "Especie no permitida", description: "Peces no están permitidos en esta sección." });
+        setSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.from("adoption_posts").insert({
         title,
-        species: normalizeSpecies(species),
+        species: normalizedSpecies || null,
         breed: breed || null,
         age: age || null,
         description: description || null,
@@ -176,8 +183,15 @@ export default function AdoptionsNew() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Fotos</label>
+              <p className="text-xs text-muted-foreground mb-2">Máximo 3 fotos</p>
               <FileUpload
-                onFilesSelected={(files) => setSelectedFiles(Array.from(files))}
+                onFilesSelected={(files) => {
+                  const incoming = Array.from(files);
+                  if (incoming.length > 3) {
+                    toast({ title: "Límite de fotos", description: "Solo puedes subir hasta 3 fotos." });
+                  }
+                  setSelectedFiles(incoming.slice(0, 3));
+                }}
                 onFileRemove={(index) => {
                   const newFiles = [...selectedFiles];
                   newFiles.splice(index, 1);

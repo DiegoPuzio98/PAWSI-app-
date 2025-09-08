@@ -9,7 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { uploadFile } from "@/utils/fileUpload";
-import { User, Camera, Save } from "lucide-react";
+import { User, Camera, Save, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Link } from "react-router-dom";
 
 interface Profile {
@@ -27,6 +28,7 @@ export default function Profile() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -108,6 +110,24 @@ export default function Profile() {
       toast({ title: "Error", description: error.message || "No se pudo actualizar el perfil" });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-user');
+      // If supabase-js returns { data, error }, error will be populated on failure
+      if (error) throw error;
+      toast({ title: "Cuenta eliminada", description: "Tu cuenta ha sido eliminada correctamente." });
+      await supabase.auth.signOut();
+      window.location.href = "/";
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      toast({ title: "Error", description: error?.message || "No se pudo eliminar la cuenta" });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -225,6 +245,37 @@ export default function Profile() {
                 {saving ? "Guardando..." : "Guardar Cambios"}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="text-destructive">Eliminar cuenta</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">Esta acción no se puede deshacer. Se eliminará tu cuenta de forma permanente.</p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={deleting}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {deleting ? "Eliminando..." : "Eliminar cuenta"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Esto no se puede revertir. ¿Seguro?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta acción borrará tu cuenta definitivamente y cerrará tu sesión.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction className="bg-destructive hover:bg-destructive/90" onClick={handleDeleteAccount}>
+                    Sí, eliminar mi cuenta
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </main>
