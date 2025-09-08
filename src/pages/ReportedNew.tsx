@@ -203,7 +203,7 @@ export default function ReportedNew() {
                     <SelectItem value="seen">Visto</SelectItem>
                     <SelectItem value="injured">Herido</SelectItem>
                     <SelectItem value="sick">Enfermo</SelectItem>
-                    <SelectItem value="dead">Muerto</SelectItem>
+                    <SelectItem value="dead">Sin vida</SelectItem>
                     <SelectItem value="other">Otro</SelectItem>
                   </SelectContent>
                 </Select>
