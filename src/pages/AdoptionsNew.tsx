@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { MapboxPicker } from "@/components/MapboxPicker";
+import { ColorSelector } from "@/components/ColorSelector";
+import { BreedSelector } from "@/components/BreedSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +33,7 @@ export default function AdoptionsNew() {
   const [locationLat, setLocationLat] = useState<number | null>(null);
   const [locationLng, setLocationLng] = useState<number | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -80,6 +83,7 @@ export default function AdoptionsNew() {
         location_lat: locationLat,
         location_lng: locationLng,
         images,
+        colors,
         contact_whatsapp: whatsapp || null,
         contact_phone: phone || null,
         contact_email: email || null,
@@ -131,7 +135,11 @@ export default function AdoptionsNew() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Raza</label>
-                <Input value={breed} onChange={(e) => setBreed(e.target.value)} />
+                <BreedSelector 
+                  species={species}
+                  breed={breed}
+                  onBreedChange={setBreed}
+                />
               </div>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
@@ -143,6 +151,14 @@ export default function AdoptionsNew() {
                 <label className="block text-sm font-medium mb-1">Área</label>
                 <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Barrio / zona" />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Colores</label>
+              <ColorSelector 
+                selectedColors={colors}
+                onColorsChange={setColors}
+                maxColors={4}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Descripción</label>

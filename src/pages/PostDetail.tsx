@@ -60,16 +60,16 @@ export default function PostDetail() {
         
         switch (type) {
           case 'lost':
-            ({ data, error } = await supabase.from('lost_posts_public').select('*').eq('id', id).single());
+            ({ data, error } = await supabase.from('lost_posts').select('*').eq('id', id).eq('status', 'active').single());
             break;
           case 'reported':
-            ({ data, error } = await supabase.from('reported_posts_public').select('*').eq('id', id).single());
+            ({ data, error } = await supabase.from('reported_posts').select('*').eq('id', id).eq('status', 'active').single());
             break;
           case 'adoption':
-            ({ data, error } = await supabase.from('adoption_posts_public').select('*').eq('id', id).single());
+            ({ data, error } = await supabase.from('adoption_posts').select('*').eq('id', id).eq('status', 'active').single());
             break;
           case 'classifieds':
-            ({ data, error } = await supabase.from('classifieds_public').select('*').eq('id', id).single());
+            ({ data, error } = await supabase.from('classifieds').select('*').eq('id', id).eq('status', 'active').single());
             break;
           default:
             throw new Error('Invalid post type');

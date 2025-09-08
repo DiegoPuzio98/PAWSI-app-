@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MapPin, Calendar, Plus, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MapPin, Calendar, Plus, Heart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { PostActions } from "@/components/PostActions";
+import { AdvancedSearch } from "@/components/AdvancedSearch";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 interface AdoptionPost {
   id: string;
@@ -18,6 +20,7 @@ interface AdoptionPost {
   description: string;
   location_text: string;
   images: string[];
+  colors: string[];
   created_at: string;
   contact_whatsapp?: string;
   contact_phone?: string;
@@ -26,16 +29,22 @@ interface AdoptionPost {
 
 export default function Adoptions() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<AdoptionPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [speciesFilter, setSpeciesFilter] = useState("");
-
-  const species = ['dogs', 'cats', 'birds', 'rodents', 'fish'];
+  const [speciesFilter, setSpeciesFilter] = useState("all");
+  const [colorFilters, setColorFilters] = useState<string[]>([]);
+  const [locationFilter, setLocationFilter] = useState("");
+  const [highlights, setHighlights] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter]);
+    if (user) {
+      fetchHighlights();
+    }
+  }, [searchTerm, speciesFilter, colorFilters, locationFilter, user]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -45,11 +54,15 @@ export default function Adoptions() {
       .order('created_at', { ascending: false });
 
     if (searchTerm) {
-      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%`);
+      query = query.or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location_text.ilike.%${searchTerm}%,breed.ilike.%${searchTerm}%`);
     }
 
     if (speciesFilter && speciesFilter !== 'all') {
       query = query.eq('species', speciesFilter);
+    }
+
+    if (locationFilter) {
+      query = query.ilike('location_text', `%${locationFilter}%`);
     }
 
     const { data, error } = await query;
@@ -57,9 +70,39 @@ export default function Adoptions() {
     if (error) {
       console.error('Error fetching posts:', error);
     } else {
-      setPosts(data || []);
+      // Filter by colors if any are selected
+      let filteredData = data || [];
+      if (colorFilters.length > 0) {
+        filteredData = filteredData.filter(post => 
+          post.colors && colorFilters.some(color => 
+            post.colors.includes(color)
+          )
+        );
+      }
+      setPosts(filteredData);
     }
     setLoading(false);
+  };
+
+  const fetchHighlights = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('user_highlights')
+      .select('post_id')
+      .eq('user_id', user.id)
+      .eq('post_type', 'adoption');
+    
+    if (data) {
+      setHighlights(new Set(data.map(h => h.post_id)));
+    }
+  };
+
+  const handleReset = () => {
+    setSearchTerm("");
+    setSpeciesFilter("all");
+    setColorFilters([]);
+    setLocationFilter("");
   };
 
   return (
@@ -77,44 +120,35 @@ export default function Adoptions() {
           </Link>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder={t('action.search')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-          <Select value={speciesFilter} onValueChange={setSpeciesFilter}>
-            <SelectTrigger className="w-48">
-              <SelectValue placeholder={t('form.species')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas las especies</SelectItem>
-              {species.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {t(`species.${s}`)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Advanced Search */}
+        <AdvancedSearch
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          speciesFilter={speciesFilter}
+          onSpeciesFilterChange={setSpeciesFilter}
+          colorFilters={colorFilters}
+          onColorFiltersChange={setColorFilters}
+          locationFilter={locationFilter}
+          onLocationFilterChange={setLocationFilter}
+          onReset={handleReset}
+        />
 
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden border-l-4 border-l-primary">
+            <Card key={post.id} className="overflow-hidden border-l-4 border-l-primary cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/adoption/${post.id}`)}>
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img 
-                    src={post.images[0]} 
+                    src={post.images[0].startsWith('http') 
+                      ? post.images[0] 
+                      : `https://jwvcgawjkltegcnyyryo.supabase.co/storage/v1/object/public/posts/${post.images[0]}`
+                    }
                     alt={post.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -143,6 +177,22 @@ export default function Adoptions() {
                     </span>
                   )}
                 </div>
+
+                {/* Colors */}
+                {post.colors && post.colors.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {post.colors.slice(0, 3).map((color) => (
+                      <Badge key={color} variant="outline" className="text-xs">
+                        🎨 {color}
+                      </Badge>
+                    ))}
+                    {post.colors.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{post.colors.length - 3}
+                      </Badge>
+                    )}
+                  </div>
+                )}
                 
                 <p className="text-sm mb-3 line-clamp-2">{post.description}</p>
                 
@@ -156,28 +206,23 @@ export default function Adoptions() {
                   <span>{new Date(post.created_at).toLocaleDateString()}</span>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
-                  {post.contact_whatsapp && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`https://wa.me/${post.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_phone && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`tel:${post.contact_phone}`}>
-                        {t('form.phone')}
-                      </a>
-                    </Button>
-                  )}
-                  {post.contact_email && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`mailto:${post.contact_email}`}>
-                        Email
-                      </a>
-                    </Button>
-                  )}
+                {/* Post Actions */}
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PostActions
+                    postId={post.id}
+                    postType="adoption"
+                    contactWhatsapp={post.contact_whatsapp}
+                    isHighlighted={highlights.has(post.id)}
+                    onHighlightChange={(highlighted) => {
+                      const newHighlights = new Set(highlights);
+                      if (highlighted) {
+                        newHighlights.add(post.id);
+                      } else {
+                        newHighlights.delete(post.id);
+                      }
+                      setHighlights(newHighlights);
+                    }}
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -59,8 +59,9 @@ export default function ReportedPets() {
 
   const fetchPosts = async () => {
     let query = supabase
-      .from('reported_posts_public')
+      .from('reported_posts')
       .select('*')
+      .eq('status', 'active')
       .order('created_at', { ascending: false });
 
     if (searchTerm) {

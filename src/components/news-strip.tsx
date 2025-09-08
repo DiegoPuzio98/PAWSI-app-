@@ -27,15 +27,17 @@ export const NewsStrip = () => {
       try {
         // Fetch latest lost posts
         const { data: lostPosts } = await supabase
-          .from('lost_posts_public')
+          .from('lost_posts')
           .select('id, title, location_text, created_at, species, images')
+          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(3);
 
         // Fetch latest reported posts
         const { data: reportedPosts } = await supabase
-          .from('reported_posts_public')
+          .from('reported_posts')
           .select('id, title, location_text, created_at, species, images')
+          .eq('status', 'active')
           .order('created_at', { ascending: false })
           .limit(3);
 
