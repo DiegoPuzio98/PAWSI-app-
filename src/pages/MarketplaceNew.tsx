@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { FileUpload } from "@/components/ui/file-upload";
 import { MapboxPicker } from "@/components/MapboxPicker";
+import { LocationSelector } from "@/components/LocationSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -33,12 +34,31 @@ export default function MarketplaceNew() {
   const [location, setLocation] = useState("");
   const [locationLat, setLocationLat] = useState<number | null>(null);
   const [locationLng, setLocationLng] = useState<number | null>(null);
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [storeContact, setStoreContact] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+
+  // Load user's profile location
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setCountry(data.country || "");
+            setProvince(data.province || "");
+          }
+        });
+    }
+  }, [user]);
 
   const onSubmit = async () => {
     if (!title || !category) {
@@ -121,6 +141,16 @@ export default function MarketplaceNew() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <LocationSelector
+                country={country}
+                province={province}
+                onCountryChange={setCountry}
+                onProvinceChange={setProvince}
+                disabled={submitting}
+              />
             </div>
             <div className="grid md:grid-cols-3 gap-4">
               <div>

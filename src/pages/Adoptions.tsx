@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { MapPin, Calendar, Plus, Heart } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PostActions } from "@/components/PostActions";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
 
 interface AdoptionPost {
   id: string;
@@ -37,6 +37,7 @@ export default function Adoptions() {
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [userProfile, setUserProfile] = useState<{country?: string, province?: string} | null>(null);
   const [searchParams] = useSearchParams();
   const [highlights, setHighlights] = useState<Set<string>>(new Set());
 
@@ -57,8 +58,20 @@ export default function Adoptions() {
     const sp = searchParams.get('species');
     if (q) setSearchTerm(q);
     if (sp) setSpeciesFilter(sp);
+    
+    // Load user profile for location filtering
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          setUserProfile(data);
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchPosts();

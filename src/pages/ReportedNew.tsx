@@ -14,6 +14,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 import { MapboxPicker } from "@/components/MapboxPicker";
 import { ColorSelector } from "@/components/ColorSelector";
 import { BreedSelector } from "@/components/BreedSelector";
+import { LocationSelector } from "@/components/LocationSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import bcrypt from "bcryptjs";
 
@@ -32,6 +33,8 @@ export default function ReportedNew() {
   const [location, setLocation] = useState("");
   const [locationLat, setLocationLat] = useState<number | null>(null);
   const [locationLng, setLocationLng] = useState<number | null>(null);
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
@@ -60,10 +63,25 @@ export default function ReportedNew() {
     setCaptchaValid(false);
   };
 
-  // Generate captcha on component mount
+  // Generate captcha on component mount and load user profile location
   useEffect(() => {
     generateCaptcha();
-  }, []);
+    
+    // Load user's profile location
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setCountry(data.country || "");
+            setProvince(data.province || "");
+          }
+        });
+    }
+  }, [user]);
 
   const onSubmit = async () => {
     if (!title || !location) {
@@ -187,6 +205,16 @@ export default function ReportedNew() {
             <div>
               <label className="block text-sm font-medium mb-1">Descripción</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <LocationSelector
+                country={country}
+                province={province}
+                onCountryChange={setCountry}
+                onProvinceChange={setProvince}
+                disabled={submitting}
+              />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>

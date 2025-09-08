@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 import { MapboxPicker } from "@/components/MapboxPicker";
 import { ColorSelector } from "@/components/ColorSelector";
 import { BreedSelector } from "@/components/BreedSelector";
+import { LocationSelector } from "@/components/LocationSelector";
 import { uploadFiles } from "@/utils/fileUpload";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
@@ -32,6 +33,8 @@ export default function AdoptionsNew() {
   const [location, setLocation] = useState("");
   const [locationLat, setLocationLat] = useState<number | null>(null);
   const [locationLng, setLocationLng] = useState<number | null>(null);
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [whatsapp, setWhatsapp] = useState("");
@@ -46,6 +49,23 @@ export default function AdoptionsNew() {
     crypto.getRandomValues(arr);
     return (arr[0] % 900000 + 100000).toString();
   };
+
+  // Load user's profile location
+  useEffect(() => {
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setCountry(data.country || "");
+            setProvince(data.province || "");
+          }
+        });
+    }
+  }, [user]);
 
   const onSubmit = async () => {
     if (!title) {
@@ -148,6 +168,16 @@ export default function AdoptionsNew() {
                   onBreedChange={setBreed}
                 />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ubicación</label>
+              <LocationSelector
+                country={country}
+                province={province}
+                onCountryChange={setCountry}
+                onProvinceChange={setProvince}
+                disabled={submitting}
+              />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>

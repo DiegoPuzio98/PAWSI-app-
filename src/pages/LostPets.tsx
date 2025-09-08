@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { PostActions } from "@/components/PostActions";
@@ -29,12 +30,14 @@ interface LostPost {
 
 export default function LostPets() {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [posts, setPosts] = useState<LostPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [speciesFilter, setSpeciesFilter] = useState("all");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
+  const [userProfile, setUserProfile] = useState<{country?: string, province?: string} | null>(null);
   const [searchParams] = useSearchParams();
 
   const speciesKeyForI18n = (s?: string | null) => {
@@ -61,8 +64,20 @@ export default function LostPets() {
     const sp = searchParams.get('species');
     if (q) setSearchTerm(q);
     if (sp) setSpeciesFilter(sp);
+    
+    // Load user profile for location filtering
+    if (user?.id) {
+      supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          setUserProfile(data);
+        });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchPosts();
