@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { ConsentAlert } from "@/components/ConsentAlert";
+import { LocationSelector } from "@/components/LocationSelector";
 
 export default function VeterinariansNew() {
   const { toast } = useToast();
@@ -30,6 +31,8 @@ export default function VeterinariansNew() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [country, setCountry] = useState("");
+  const [province, setProvince] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,8 +54,8 @@ export default function VeterinariansNew() {
   };
 
   const onSubmit = async () => {
-    if (!name || !address) {
-      toast({ title: "Faltan campos obligatorios", description: "Nombre y dirección son requeridos" });
+    if (!name || !address || !country || !province) {
+      toast({ title: "Faltan campos obligatorios", description: "Nombre, dirección, país y provincia son requeridos" });
       return;
     }
     if (!user) {
@@ -73,13 +76,6 @@ export default function VeterinariansNew() {
         }
       }
 
-      // Get user's country and province to ensure visibility in listings
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('country, province')
-        .eq('id', user.id)
-        .single();
-
       const { error } = await supabase.from("veterinarians").insert({
         name,
         description: description || null,
@@ -94,8 +90,8 @@ export default function VeterinariansNew() {
         images,
         status: "active",
         user_id: user?.id,
-        country: profile?.country || null,
-        province: profile?.province || null,
+        country,
+        province,
       });
 
       if (error) throw error;
@@ -142,6 +138,19 @@ export default function VeterinariansNew() {
             <div>
               <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Describe los servicios y características de la veterinaria..." />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Ubicación <span className="text-destructive">*</span>
+              </label>
+              <LocationSelector
+                country={country}
+                province={province}
+                onCountryChange={setCountry}
+                onProvinceChange={setProvince}
+                disabled={submitting}
+              />
             </div>
 
             <div>
