@@ -73,6 +73,13 @@ export default function VeterinariansNew() {
         }
       }
 
+      // Get user's country and province to ensure visibility in listings
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('country, province')
+        .eq('id', user.id)
+        .single();
+
       const { error } = await supabase.from("veterinarians").insert({
         name,
         description: description || null,
@@ -87,6 +94,8 @@ export default function VeterinariansNew() {
         images,
         status: "active",
         user_id: user?.id,
+        country: profile?.country || null,
+        province: profile?.province || null,
       });
 
       if (error) throw error;

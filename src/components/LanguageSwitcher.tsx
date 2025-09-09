@@ -9,7 +9,7 @@ export function LanguageSwitcher() {
     <Button
       variant="ghost"
       size="sm"
-      onClick={() => setLanguage(language === 'es' ? 'en' : 'es')}
+      onClick={() => setLanguage(language === 'es' ? 'en' : language === 'en' ? 'pt' : 'es')}
       className="flex items-center gap-2"
     >
       <Globe className="h-4 w-4" />

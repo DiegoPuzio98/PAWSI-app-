@@ -58,7 +58,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           <SelectTrigger>
             <SelectValue placeholder="Selecciona tu país" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-64 overflow-y-auto">
             {countries.map((countryOption) => (
               <SelectItem key={countryOption} value={countryOption}>
                 {countryOption}
@@ -80,7 +80,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
           <SelectTrigger>
             <SelectValue placeholder="Selecciona tu provincia/estado" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-64 overflow-y-auto">
             {availableProvinces.map((provinceOption) => (
               <SelectItem key={provinceOption} value={provinceOption}>
                 {provinceOption}

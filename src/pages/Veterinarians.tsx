@@ -83,7 +83,7 @@ export default function Veterinarians() {
       
       <main className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-primary">Veterinarios</h1>
+          <h1 className="text-3xl font-bold text-primary">{t('nav.veterinarians')}</h1>
           <Link to="/veterinarians/new">
             <Button>
               <Plus className="h-4 w-4 mr-2" />
@@ -98,7 +98,7 @@ export default function Veterinarians() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Buscar veterinarias..."
+                placeholder={t('action.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-type Language = 'es' | 'en';
+type Language = 'es' | 'en' | 'pt';
 
 interface LanguageContextType {
   language: Language;
@@ -182,6 +182,93 @@ const translations = {
     'disclaimer.animalSales': 'IT IS FORBIDDEN TO USE THIS SECTION TO SELL ANIMALS.',
     'disclaimer.platform': 'This platform is collaborative; meeting in safe, public places is recommended.',
     'disclaimer.privacy': 'Privacy by default: avoid exact addresses, license plates, or faces of minors.',
+  },
+  pt: {
+    // Navigation
+    'nav.home': 'Início',
+    'nav.reported': 'Animais Reportados',
+    'nav.lost': 'Animais Perdidos',
+    'nav.marketplace': 'Compra e Venda',
+    'nav.veterinarians': 'Veterinários',
+    'nav.adoptions': 'Adoções',
+    'nav.support': 'Suporte',
+    'nav.dashboard': 'Dados da conta',
+    'nav.saved': 'Salvos',
+    'nav.profile': 'Perfil',
+
+    // Homepage
+    'home.welcome': 'Bem-vindo ao Pawsi',
+    'home.subtitle': 'Ajude a reunir pets com suas famílias',
+    'home.animalSighted': 'Animal Avistado',
+    'home.animalSightedDesc': 'Reporte um pet que você viu',
+    'home.reportSighting': 'Reportar Avistamento',
+    'home.lostPet': 'Pet Perdido',
+    'home.lostPetDesc': 'Publique um alerta de pet perdido',
+    'home.postAlert': 'Publicar Alerta',
+    'home.adoptions': 'Adoções',
+    'home.buySell': 'Compra e Venda',
+    'home.latestNews': 'Últimas Notícias',
+
+    // Authentication
+    'auth.welcome': 'Bem-vindo ao Pawsi',
+    'auth.subtitle': 'Entre para ajudar a reunir pets com suas famílias',
+    'auth.signIn': 'Entrar',
+    'auth.signUp': 'Criar Conta',
+    'auth.email': 'Email',
+    'auth.password': 'Senha',
+    'auth.signingIn': 'Entrando...',
+    'auth.creatingAccount': 'Criando conta...',
+    'auth.checkEmail': 'Verifique seu email',
+    'auth.confirmationSent': 'Enviamos um link de confirmação para concluir seu cadastro.',
+    'auth.welcomeBack': 'Bem-vindo de volta!',
+    'auth.signedInSuccess': 'Você entrou com sucesso.',
+    'auth.error': 'Erro',
+    'auth.signOut': 'Sair',
+
+    // Forms
+    'form.title': 'Título',
+    'form.species': 'Espécie',
+    'form.breed': 'Raça',
+    'form.description': 'Descrição',
+    'form.location': 'Localização',
+    'form.contact': 'Contato',
+    'form.whatsapp': 'WhatsApp',
+    'form.phone': 'Telefone',
+    'form.email': 'Email',
+    'form.images': 'Imagens',
+    'form.submit': 'Enviar',
+    'form.cancel': 'Cancelar',
+
+    // Species
+    'species.dogs': 'Cães',
+    'species.cats': 'Gatos',
+    'species.birds': 'Aves',
+    'species.rodents': 'Roedores',
+    'species.fish': 'Peixes',
+
+    // Status
+    'status.lost': 'Perdido',
+    'status.reported': 'Reportado',
+    'status.active': 'Ativo',
+    'status.resolved': 'Resolvido',
+    'status.seen': 'Visto',
+    'status.injured': 'Ferido',
+    'status.sick': 'Doente',
+    'status.dead': 'Sem vida',
+    'status.other': 'Outro',
+
+    // Actions
+    'action.search': 'Pesquisar',
+    'action.filter': 'Filtrar',
+    'action.report': 'Denunciar',
+    'action.markResolved': 'Marcar como Resolvido',
+    'action.edit': 'Editar',
+    'action.delete': 'Excluir',
+
+    // Disclaimers
+    'disclaimer.animalSales': 'É PROIBIDO USAR ESTA SEÇÃO PARA VENDER ANIMAIS.',
+    'disclaimer.platform': 'Esta plataforma é colaborativa; recomenda-se se encontrar em locais públicos e seguros.',
+    'disclaimer.privacy': 'Privacidade por padrão: evite endereços exatos, placas de veículos ou rostos de menores.',
   }
 };
 
