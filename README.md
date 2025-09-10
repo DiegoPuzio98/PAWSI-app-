@@ -110,7 +110,6 @@ VITE_MAPBOX_TOKEN=tu_token
 VITE_TURNSTILE_SITE_KEY=tu_site_key
 TURNSTILE_SECRET_KEY=tu_secret_key
 RESEND_API_KEY=tu_api_key
-RESEND_FROM=soporte@tudominio.com
 
 Lengugajes utilizados:
 TypeScript
@@ -140,7 +139,7 @@ npm run preview
 
 Licencia:
 
-Este proyecto está bajo la licencia MIT.
+Este proyecto está bajo la licencia Apache-2.0.
 Consulta el archivo LICENSE
  para más detalles.
 
