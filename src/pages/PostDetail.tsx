@@ -403,11 +403,12 @@ export default function PostDetail() {
                   {loadingContact ? "Cargando..." : "Mostrar información de contacto"}
                 </Button>
               ) : (
-                <ContactOptions 
+                <ContactOptions
                   contactInfo={contactInfo}
-                  postId={post.id}
-                  postType={type === 'classifieds' ? 'classified' : (type as any)}
+                  postId={id!}
+                  postType={type!}
                   recipientId={post.user_id || ''}
+                  postTitle={post.title}
                   loading={loadingContact}
                 />
               )}

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare, Phone, Mail } from "lucide-react";
-import { MessageCenter } from "./MessageCenter";
+import { ChatCenter } from "@/components/ChatCenter";
 
 interface ContactInfo {
   contact_email?: string;
@@ -15,10 +15,11 @@ interface ContactOptionsProps {
   postId: string;
   postType: string;
   recipientId: string;
-  loading: boolean;
+  postTitle?: string;
+  loading?: boolean;
 }
 
-export function ContactOptions({ contactInfo, postId, postType, recipientId, loading }: ContactOptionsProps) {
+export function ContactOptions({ contactInfo, postId, postType, recipientId, postTitle, loading = false }: ContactOptionsProps) {
   if (loading) {
     return (
       <Card>
@@ -38,11 +39,12 @@ export function ContactOptions({ contactInfo, postId, postType, recipientId, loa
         <h3 className="font-semibold mb-3">Opciones de contacto</h3>
         
         {/* Internal messaging system */}
-        <MessageCenter 
-          postId={postId}
-          postType={postType}
-          recipientId={recipientId}
-        />
+      <ChatCenter 
+        postId={postId}
+        postType={postType}
+        recipientId={recipientId}
+        postTitle={postTitle}
+      />
 
         {hasContactInfo && (
           <>
