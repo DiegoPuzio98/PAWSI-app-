@@ -89,6 +89,10 @@ export default function PostDetail() {
             break;
           case 'veterinarians':
             ({ data, error } = await supabase.from('veterinarians').select('*').eq('id', id).eq('status', 'active').single());
+            // Map name to title for consistency
+            if (data) {
+              data.title = data.name;
+            }
             break;
           default:
             throw new Error('Invalid post type');
@@ -124,7 +128,9 @@ export default function PostDetail() {
 
     setLoadingContact(true);
     try {
-      const post_table = type === 'classifieds' ? 'classifieds' : `${type}_posts`;
+      const post_table = type === 'classifieds' ? 'classifieds' : 
+                        type === 'veterinarians' ? 'veterinarians' : 
+                        `${type}_posts`;
       const { data, error } = await supabase.rpc('get_post_contact_info', {
         post_table,
         post_id: id
