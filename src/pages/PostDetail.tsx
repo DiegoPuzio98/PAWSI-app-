@@ -14,6 +14,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { SensitiveImage } from "@/components/SensitiveImage";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ImageLightbox } from "@/components/ImageLightbox";
+import { ContactOptions } from "@/components/ContactOptions";
 
 interface PostData {
   id: string;
@@ -35,6 +36,13 @@ interface PostData {
   category?: string;
   condition?: string;
   price?: number;
+  // Veterinarian specific fields
+  address?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  services?: string[];
 }
 
 interface ContactInfo {
@@ -78,6 +86,9 @@ export default function PostDetail() {
             break;
           case 'classifieds':
             ({ data, error } = await supabase.from('classifieds').select('*').eq('id', id).eq('status', 'active').single());
+            break;
+          case 'veterinarians':
+            ({ data, error } = await supabase.from('veterinarians').select('*').eq('id', id).eq('status', 'active').single());
             break;
           default:
             throw new Error('Invalid post type');
@@ -164,7 +175,10 @@ export default function PostDetail() {
       case 'lost': return 'Perdido';
       case 'reported': return 'Reportado';
       case 'adoption': return 'Adopción';
-      case 'classifieds': return 'Clasificado';
+      case 'veterinarians':
+        return 'Veterinaria';
+      case 'classifieds':
+        return 'Clasificado';
       default: return type;
     }
   };
@@ -174,7 +188,10 @@ export default function PostDetail() {
       case 'lost': return 'destructive';
       case 'reported': return 'default';
       case 'adoption': return 'secondary';
-      case 'classifieds': return 'outline';
+      case 'veterinarians':
+        return 'default';
+      case 'classifieds':
+        return 'outline';
       default: return 'default';
     }
   };
@@ -386,60 +403,35 @@ export default function PostDetail() {
                   {loadingContact ? "Cargando..." : "Mostrar información de contacto"}
                 </Button>
               ) : (
-                <div className="space-y-3">
-                  {contactInfo.contact_whatsapp && (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => window.open(`https://wa.me/${contactInfo.contact_whatsapp.replace(/\D/g, '')}`, '_blank')}
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      WhatsApp: {contactInfo.contact_whatsapp}
-                    </Button>
-                  )}
-                  {contactInfo.contact_phone && (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => window.open(`tel:${contactInfo.contact_phone}`, '_blank')}
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      Teléfono: {contactInfo.contact_phone}
-                    </Button>
-                  )}
-                  {contactInfo.contact_email && (
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => window.open(`mailto:${contactInfo.contact_email}`, '_blank')}
-                    >
-                      <Mail className="h-4 w-4 mr-2" />
-                      Email: {contactInfo.contact_email}
-                    </Button>
-                  )}
-                </div>
-              )}
-
-              {/* Owner actions */}
-              {user && post.user_id === user.id && post.status === 'active' && (
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    try {
-                      const table = type === 'reported' ? 'reported_posts' : type === 'lost' ? 'lost_posts' : type === 'adoption' ? 'adoption_posts' : 'classifieds';
-                      const { error } = await supabase.from(table).update({ status: 'resolved' }).eq('id', post.id);
-                      if (error) throw error;
-                      toast({ title: 'Caso marcado como resuelto' });
-                      navigate(-1);
-                    } catch (e: any) {
-                      toast({ title: 'Error', description: e.message, variant: 'destructive' });
-                    }
-                  }}
-                >
-                  {t('action.markResolved')}
-                </Button>
+                <ContactOptions 
+                  contactInfo={contactInfo}
+                  postId={post.id}
+                  postType={type === 'classifieds' ? 'classified' : (type as any)}
+                  recipientId={post.user_id || ''}
+                  loading={loadingContact}
+                />
               )}
             </div>
+
+            {/* Owner actions */}
+            {user && post.user_id === user.id && post.status === 'active' && (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const table = type === 'reported' ? 'reported_posts' : type === 'lost' ? 'lost_posts' : type === 'adoption' ? 'adoption_posts' : type === 'veterinarians' ? 'veterinarians' : 'classifieds';
+                    const { error } = await supabase.from(table).update({ status: 'resolved' }).eq('id', post.id);
+                    if (error) throw error;
+                    toast({ title: 'Caso marcado como resuelto' });
+                    navigate(-1);
+                  } catch (e: any) {
+                    toast({ title: 'Error', description: e.message, variant: 'destructive' });
+                  }
+                }}
+              >
+                {t('action.markResolved')}
+              </Button>
+            )}
           </div>
         </Card>
         <div className="fixed bottom-6 right-6 z-50">

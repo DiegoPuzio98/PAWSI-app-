@@ -110,87 +110,61 @@ export default function Veterinarians() {
         {/* Veterinarians Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {veterinarians.map((vet) => (
-            <Card key={vet.id} className="overflow-hidden">
-              {vet.images?.[0] && (
-                <div className="aspect-video bg-muted">
-                  <img 
-                    src={vet.images[0]} 
-                    alt={vet.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <CardContent className="p-4">
-                <div className="mb-3">
-                  <h3 className="font-semibold text-lg mb-2">{vet.name}</h3>
-                  
-                  <div className="flex items-start text-sm text-muted-foreground mb-2">
-                    <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
-                    <span className="break-words">{vet.address}</span>
+            <Link key={vet.id} to={`/post/veterinarians/${vet.id}`}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                {vet.images?.[0] && (
+                  <div className="aspect-video bg-muted">
+                    <img 
+                      src={vet.images[0]} 
+                      alt={vet.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  
-                  {vet.description && (
-                    <p className="text-sm mb-3 line-clamp-2">{vet.description}</p>
-                  )}
-                  
-                  {vet.services && vet.services.length > 0 && (
-                    <div className="mb-3">
-                      <div className="flex flex-wrap gap-1">
-                        {vet.services.slice(0, 3).map((service, index) => (
-                          <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                            {service}
-                          </span>
-                        ))}
-                        {vet.services.length > 3 && (
-                          <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
-                            +{vet.services.length - 3} más
-                          </span>
-                        )}
-                      </div>
+                )}
+                <CardContent className="p-4">
+                  <div className="mb-3">
+                    <h3 className="font-semibold text-lg mb-2">{vet.name}</h3>
+                    
+                    <div className="flex items-start text-sm text-muted-foreground mb-2">
+                      <MapPin className="h-4 w-4 mr-1 mt-0.5 flex-shrink-0" />
+                      <span className="break-words">{vet.address}</span>
                     </div>
-                  )}
-                  
-                  <div className="flex items-center text-xs text-muted-foreground mb-3">
-                    <Calendar className="h-3 w-3 mr-1" />
-                    <span>{new Date(vet.created_at).toLocaleDateString()}</span>
+                    
+                    {vet.description && (
+                      <p className="text-sm mb-3 line-clamp-2">{vet.description}</p>
+                    )}
+                    
+                    {vet.services && vet.services.length > 0 && (
+                      <div className="mb-3">
+                        <div className="flex flex-wrap gap-1">
+                          {vet.services.slice(0, 3).map((service, index) => (
+                            <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                              {service}
+                            </span>
+                          ))}
+                          {vet.services.length > 3 && (
+                            <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">
+                              +{vet.services.length - 3} más
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center text-xs text-muted-foreground mb-3">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      <span>{new Date(vet.created_at).toLocaleDateString()}</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex gap-2 flex-wrap">
-                  {vet.whatsapp && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`https://wa.me/${vet.whatsapp}`} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                      </a>
+                  <div className="flex gap-2 flex-wrap">
+                    <Button size="sm" variant="outline">
+                      Ver detalles
                     </Button>
-                  )}
-                  {vet.phone && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`tel:${vet.phone}`}>
-                        <Phone className="h-3 w-3 mr-1" />
-                        Llamar
-                      </a>
-                    </Button>
-                  )}
-                  {vet.email && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`mailto:${vet.email}`}>
-                        <Mail className="h-3 w-3 mr-1" />
-                        Email
-                      </a>
-                    </Button>
-                  )}
-                  {vet.website && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={vet.website} target="_blank" rel="noopener noreferrer">
-                        <Globe className="h-3 w-3 mr-1" />
-                        Web
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 

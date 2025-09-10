@@ -146,74 +146,60 @@ export default function Marketplace() {
         {/* Classifieds Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {classifieds.map((classified) => (
-            <Card key={classified.id} className="overflow-hidden">
-              {classified.images?.[0] && (
-                <div className="aspect-video bg-muted">
-                  <img 
-                    src={classified.images[0]} 
-                    alt={classified.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg">{classified.title}</h3>
-                  {classified.category && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                      {classified.category.charAt(0).toUpperCase() + classified.category.slice(1)}
-                    </span>
-                  )}
-                </div>
-                
-                {classified.price && (
-                  <div className="flex items-center text-lg font-bold text-primary mb-2">
-                    <DollarSign className="h-4 w-4" />
-                    <span>{classified.price.toLocaleString()}</span>
+            <Link key={classified.id} to={`/post/classifieds/${classified.id}`}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                {classified.images?.[0] && (
+                  <div className="aspect-video bg-muted">
+                    <img 
+                      src={classified.images[0]} 
+                      alt={classified.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 )}
-                
-                {classified.condition && (
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Estado: {classified.condition}
-                  </p>
-                )}
-                
-                <p className="text-sm mb-3 line-clamp-2">{classified.description}</p>
-                
-                <div className="flex items-center text-xs text-muted-foreground mb-2">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  <span className="truncate">{classified.location_text}</span>
-                </div>
-                
-                <div className="flex items-center text-xs text-muted-foreground mb-3">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  <span>{new Date(classified.created_at).toLocaleDateString()}</span>
-                </div>
+                <CardContent className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-lg">{classified.title}</h3>
+                    {classified.category && (
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                        {classified.category.charAt(0).toUpperCase() + classified.category.slice(1)}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {classified.price && (
+                    <div className="flex items-center text-lg font-bold text-primary mb-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span>{classified.price.toLocaleString()}</span>
+                    </div>
+                  )}
+                  
+                  {classified.condition && (
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Estado: {classified.condition}
+                    </p>
+                  )}
+                  
+                  <p className="text-sm mb-3 line-clamp-2">{classified.description}</p>
+                  
+                  <div className="flex items-center text-xs text-muted-foreground mb-2">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    <span className="truncate">{classified.location_text}</span>
+                  </div>
+                  
+                  <div className="flex items-center text-xs text-muted-foreground mb-3">
+                    <Calendar className="h-3 w-3 mr-1" />
+                    <span>{new Date(classified.created_at).toLocaleDateString()}</span>
+                  </div>
 
-                <div className="flex gap-2 flex-wrap">
-                  {classified.contact_whatsapp && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`https://wa.me/${classified.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">
-                        WhatsApp
-                      </a>
-                    </Button>
-                  )}
-                  {classified.contact_email && (
-                    <Button size="sm" variant="outline" asChild>
-                      <a href={`mailto:${classified.contact_email}`}>
-                        Email
-                      </a>
-                    </Button>
-                  )}
-                  {classified.store_contact && (
+                  <div className="flex gap-2 flex-wrap">
                     <Button size="sm" variant="outline">
-                      {classified.store_contact}
+                      Ver detalles
                     </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
