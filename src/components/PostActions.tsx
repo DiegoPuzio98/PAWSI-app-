@@ -92,16 +92,6 @@ export function PostActions({
 
   return (
     <div className="flex gap-2 flex-wrap">
-      {/* CONTACT button with fallback */}
-      <Button 
-        size="sm" 
-        className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-        onClick={handleContact}
-      >
-        <MessageCircle className="h-4 w-4 mr-1" />
-        CONTACTAR
-      </Button>
-
       {/* Highlight button */}
       <Button 
         size="sm" 

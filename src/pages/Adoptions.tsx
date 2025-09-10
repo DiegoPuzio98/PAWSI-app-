@@ -10,6 +10,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { PostActions } from "@/components/PostActions";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { Badge } from "@/components/ui/badge";
+import { ContactInfoDialog } from "@/components/ContactInfoDialog";
 
 interface AdoptionPost {
   id: string;
@@ -25,6 +26,7 @@ interface AdoptionPost {
   contact_whatsapp?: string;
   contact_phone?: string;
   contact_email?: string;
+  user_id: string;
 }
 
 export default function Adoptions() {
@@ -249,23 +251,32 @@ export default function Adoptions() {
 
                 {/* Post Actions */}
                 <div onClick={(e) => e.stopPropagation()}>
-                  <PostActions
-                    postId={post.id}
-                    postType="adoption"
-                    contactWhatsapp={post.contact_whatsapp}
-                    contactPhone={post.contact_phone}
-                    contactEmail={post.contact_email}
-                    isHighlighted={highlights.has(post.id)}
-                    onHighlightChange={(highlighted) => {
-                      const newHighlights = new Set(highlights);
-                      if (highlighted) {
-                        newHighlights.add(post.id);
-                      } else {
-                        newHighlights.delete(post.id);
-                      }
-                      setHighlights(newHighlights);
-                    }}
-                  />
+                  <div className="space-y-2">
+                    <PostActions
+                      postId={post.id}
+                      postType="adoption"
+                      contactWhatsapp={post.contact_whatsapp}
+                      contactPhone={post.contact_phone}
+                      contactEmail={post.contact_email}
+                      isHighlighted={highlights.has(post.id)}
+                      onHighlightChange={(highlighted) => {
+                        const newHighlights = new Set(highlights);
+                        if (highlighted) {
+                          newHighlights.add(post.id);
+                        } else {
+                          newHighlights.delete(post.id);
+                        }
+                        setHighlights(newHighlights);
+                      }}
+                    />
+                    <ContactInfoDialog
+                      postId={post.id}
+                      postType="adoption"
+                      recipientId={post.user_id}
+                      postTitle={post.title}
+                      loading={false}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -60,6 +60,7 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-fill subject with the post title when opening a new message dialog
   useEffect(() => {
@@ -216,6 +217,11 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
         setNewMessageContent("");
       }
       
+      // Auto-scroll to bottom after sending message
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      
       // Refresh conversations to get the real message from database
       fetchConversations();
     } catch (error: any) {
@@ -306,6 +312,15 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   useEffect(() => {
     fetchConversations();
   }, [user]);
+
+  // Auto-scroll to bottom when conversation changes or new messages arrive
+  useEffect(() => {
+    if (selectedConversation) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [selectedConversation?.messages.length]);
 
   const totalUnreadCount = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
 
@@ -426,6 +441,7 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
                 </div>
               );
             })}
+            <div ref={messagesEndRef} />
           </div>
           
           <div className="border-t p-4">

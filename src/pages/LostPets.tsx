@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdvancedSearch } from "@/components/AdvancedSearch";
 import { PostActions } from "@/components/PostActions";
 import { Badge } from "@/components/ui/badge";
+import { ContactInfoDialog } from "@/components/ContactInfoDialog";
 import { MapPin, Calendar, Plus, Clock } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -26,6 +27,7 @@ interface LostPost {
   contact_whatsapp?: string;
   contact_phone?: string;
   contact_email?: string;
+  user_id: string;
 }
 
 export default function LostPets() {
@@ -223,13 +225,24 @@ export default function LostPets() {
                   <span>Expira: {new Date(post.expires_at).toLocaleDateString()}</span>
                 </div>
 
-                <PostActions 
-                  postId={post.id}
-                  postType="lost"
-                  contactWhatsapp={post.contact_whatsapp}
-                  contactPhone={post.contact_phone}
-                  contactEmail={post.contact_email}
-                />
+                <div className="space-y-2">
+                  <PostActions 
+                    postId={post.id}
+                    postType="lost"
+                    contactWhatsapp={post.contact_whatsapp}
+                    contactPhone={post.contact_phone}
+                    contactEmail={post.contact_email}
+                  />
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ContactInfoDialog
+                      postId={post.id}
+                      postType="lost"
+                      recipientId={post.user_id}
+                      postTitle={post.title}
+                      loading={false}
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
           ))}

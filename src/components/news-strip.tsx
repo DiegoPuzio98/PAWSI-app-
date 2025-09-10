@@ -157,7 +157,7 @@ export const NewsStrip = () => {
             size="sm"
             onClick={() => {
               if (scrollRef.current) {
-                scrollRef.current.scrollLeft -= 300;
+                scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
               }
             }}
           >
@@ -168,7 +168,7 @@ export const NewsStrip = () => {
             size="sm"
             onClick={() => {
               if (scrollRef.current) {
-                scrollRef.current.scrollLeft += 300;
+                scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
               }
             }}
           >
