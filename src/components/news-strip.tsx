@@ -29,6 +29,7 @@ export const NewsStrip = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [isManualScrolling, setIsManualScrolling] = useState(false);
   const [userProfile, setUserProfile] = useState<{ country?: string; province?: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -112,7 +113,7 @@ export const NewsStrip = () => {
     const animate = () => {
       if (!scrollContainer) return;
 
-      if (!isPaused) {
+      if (!isPaused && !isManualScrolling) {
         const next = scrollContainer.scrollLeft + step;
         if (posts.length > 1) {
           const originalWidth = scrollContainer.scrollWidth / 2; // because we duplicated the items
@@ -130,7 +131,7 @@ export const NewsStrip = () => {
 
     rafId = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafId);
-  }, [isPaused, posts]);
+  }, [isPaused, isManualScrolling, posts]);
 
   if (loading) {
     return (
@@ -147,6 +148,62 @@ export const NewsStrip = () => {
 
   const displayedPosts = posts.length > 1 ? [...posts, ...posts] : posts;
 
+  const handleManualScroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    
+    setIsManualScrolling(true);
+    const scrollContainer = scrollRef.current;
+    const fastStep = 1.6; // 2x the normal speed
+    const distance = 300;
+    const duration = 800; // ms
+    const startTime = Date.now();
+    const startScrollLeft = scrollContainer.scrollLeft;
+    const targetScrollLeft = direction === 'left' 
+      ? startScrollLeft - distance 
+      : startScrollLeft + distance;
+
+    const animateManualScroll = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Smooth easing function
+      const easeProgress = 1 - Math.pow(1 - progress, 3);
+      
+      const currentScrollLeft = startScrollLeft + (targetScrollLeft - startScrollLeft) * easeProgress;
+      
+      // Handle looping for manual scroll
+      if (posts.length > 1) {
+        const originalWidth = scrollContainer.scrollWidth / 2;
+        if (currentScrollLeft >= originalWidth) {
+          scrollContainer.scrollLeft = currentScrollLeft - originalWidth;
+        } else if (currentScrollLeft < 0) {
+          scrollContainer.scrollLeft = originalWidth + currentScrollLeft;
+        } else {
+          scrollContainer.scrollLeft = currentScrollLeft;
+        }
+      } else {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        if (maxScroll > 0) {
+          if (currentScrollLeft >= maxScroll) {
+            scrollContainer.scrollLeft = 0;
+          } else if (currentScrollLeft < 0) {
+            scrollContainer.scrollLeft = maxScroll;
+          } else {
+            scrollContainer.scrollLeft = currentScrollLeft;
+          }
+        }
+      }
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateManualScroll);
+      } else {
+        setIsManualScrolling(false);
+      }
+    };
+    
+    requestAnimationFrame(animateManualScroll);
+  };
+
   return (
     <div className="w-full py-4">
       <div className="flex items-center justify-between mb-3">
@@ -155,22 +212,14 @@ export const NewsStrip = () => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
-              }
-            }}
+            onClick={() => handleManualScroll('left')}
           >
             ←
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
-              }
-            }}
+            onClick={() => handleManualScroll('right')}
           >
             →
           </Button>
