@@ -61,6 +61,13 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   const { user } = useAuth();
   const { toast } = useToast();
 
+  // Auto-fill subject with the post title when opening a new message dialog
+  useEffect(() => {
+    if (newMessageOpen && postTitle && !subject) {
+      setSubject(postTitle);
+    }
+  }, [newMessageOpen, postTitle, subject]);
+
   const fetchConversations = async () => {
     if (!user) return;
 
@@ -83,6 +90,7 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
       userIds.add(msg.recipient_id);
     });
 
+    let profileMap: Record<string, Profile> = {};
     if (userIds.size > 0) {
       const { data: profileData } = await supabase
         .from('profiles')

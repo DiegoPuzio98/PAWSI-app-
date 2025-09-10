@@ -124,8 +124,9 @@ export default function PostDetail() {
 
     setLoadingContact(true);
     try {
+      const post_table = type === 'classifieds' ? 'classifieds' : `${type}_posts`;
       const { data, error } = await supabase.rpc('get_post_contact_info', {
-        post_table: `${type}_posts`,
+        post_table,
         post_id: id
       });
 

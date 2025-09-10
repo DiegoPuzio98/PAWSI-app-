@@ -161,7 +161,7 @@ export const NewsStrip = () => {
           <Card 
             key={`${post.id}-${idx}`} 
             className="min-w-[280px] bg-card hover:shadow-md transition-shadow overflow-hidden cursor-pointer"
-            onClick={() => navigate(`/${post.type}/${post.id}`)}
+            onClick={() => navigate(`/post/${post.type}/${post.id}`)}
           >
             {post.images && post.images.length > 0 && (
               <div className="relative h-32 w-full overflow-hidden">
