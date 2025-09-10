@@ -39,12 +39,14 @@ export function ContactOptions({ contactInfo, postId, postType, recipientId, pos
         <h3 className="font-semibold mb-3">Opciones de contacto</h3>
         
         {/* Internal messaging system */}
-      <ChatCenter 
-        postId={postId}
-        postType={postType}
-        recipientId={recipientId}
-        postTitle={postTitle}
-      />
+        {recipientId && postId && (
+          <ChatCenter 
+            postId={postId}
+            postType={postType}
+            recipientId={recipientId}
+            postTitle={postTitle}
+          />
+        )}
 
         {hasContactInfo && (
           <>
