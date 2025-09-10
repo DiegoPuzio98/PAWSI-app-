@@ -79,19 +79,15 @@ export function PostActions({
       return;
     }
 
-    if (contactWhatsapp) {
-      window.open(`https://wa.me/${contactWhatsapp}`, '_blank');
-      return;
+    // Navigate to post detail page to see all contact options including Pawsi
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/post/')) {
+      // Already on post detail page - this shouldn't happen
+      toast({ title: "Usa las opciones de contacto disponibles en la página" });
+    } else {
+      // Navigate to post detail to see contact options
+      window.location.href = `/post/${postType}/${postId}`;
     }
-    if (contactPhone) {
-      window.location.href = `tel:${contactPhone}`;
-      return;
-    }
-    if (contactEmail) {
-      window.location.href = `mailto:${contactEmail}`;
-      return;
-    }
-    toast({ title: "No hay datos de contacto" });
   };
 
   return (

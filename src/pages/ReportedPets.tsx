@@ -191,7 +191,7 @@ export default function ReportedPets() {
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/reported/${post.id}`)}>
+            <Card key={post.id} className="overflow-hidden cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/post/reported/${post.id}`)}>
           {post.images?.[0] && (
             <div className="relative aspect-video bg-muted">
               <SensitiveImage 

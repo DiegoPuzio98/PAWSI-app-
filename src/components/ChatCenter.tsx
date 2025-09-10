@@ -104,10 +104,14 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
       const conversationKey = [user.id, otherUserId].sort().join('-') + (message.post_id || '');
       
       if (!conversationMap.has(conversationKey)) {
+        const postTitle = message.post_id ? 
+          (message.subject.includes('Re:') ? message.subject.replace('Re: ', '') : message.subject) :
+          'Conversación general';
+          
         conversationMap.set(conversationKey, {
           otherUserId,
           otherUserName: profiles[otherUserId]?.display_name || 'Usuario',
-          postTitle: message.subject.includes('Re:') ? message.subject.replace('Re: ', '') : message.subject,
+          postTitle,
           postId: message.post_id,
           postType: message.post_type,
           messages: [],
@@ -135,9 +139,11 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
 
     setConversations(sortedConversations);
 
-    // Update profile names
+    // Update profile names with fetched data
     sortedConversations.forEach(conv => {
-      conv.otherUserName = profiles[conv.otherUserId]?.display_name || 'Usuario';
+      if (profiles[conv.otherUserId]) {
+        conv.otherUserName = profiles[conv.otherUserId].display_name || 'Usuario';
+      }
     });
   };
 
@@ -201,6 +207,10 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   const deleteConversation = async (conversation: Conversation) => {
     if (!user) return;
 
+    if (!confirm("¿Estás seguro de que quieres eliminar esta conversación? Esta acción no se puede deshacer.")) {
+      return;
+    }
+
     const messageIds = conversation.messages.map(msg => msg.id);
     
     const { error } = await supabase
@@ -220,8 +230,39 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   };
 
   const blockUser = async (userId: string) => {
-    // TODO: Implement user blocking functionality
-    toast({ title: "Usuario bloqueado", description: "El usuario ha sido bloqueado." });
+    if (!user) return;
+
+    if (!confirm("¿Estás seguro de que quieres bloquear a este usuario? También se eliminará la conversación.")) {
+      return;
+    }
+
+    try {
+      // Add user to blocks table - using any to bypass TypeScript error until types are regenerated
+      const { error: blockError } = await (supabase as any)
+        .from('user_blocks')
+        .insert({
+          blocker_id: user.id,
+          blocked_id: userId
+        });
+
+      if (blockError) throw blockError;
+
+      // Delete conversation messages
+      if (selectedConversation) {
+        const messageIds = selectedConversation.messages.map(msg => msg.id);
+        await supabase
+          .from('messages')
+          .delete()
+          .in('id', messageIds);
+      }
+
+      toast({ title: "Usuario bloqueado", description: "El usuario ha sido bloqueado y la conversación eliminada." });
+      setSelectedConversation(null);
+      fetchConversations();
+    } catch (error: any) {
+      console.error('Error blocking user:', error);
+      toast({ title: "Error", description: "No se pudo bloquear al usuario" });
+    }
   };
 
   useEffect(() => {
@@ -286,8 +327,8 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="flex-1">
-            <h2 className="text-xl font-bold">{selectedConversation.otherUserName}</h2>
-            {selectedConversation.postTitle && (
+            <h2 className="text-xl font-bold">{profiles[selectedConversation.otherUserId]?.display_name || 'Usuario'}</h2>
+            {selectedConversation.postTitle && selectedConversation.postTitle !== 'Conversación general' && (
               <p className="text-sm text-muted-foreground">Sobre: {selectedConversation.postTitle}</p>
             )}
           </div>
@@ -295,7 +336,12 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setReportDialogOpen(true)}
+              onClick={() => {
+                if (confirm("¿Estás seguro de que quieres reportar a este usuario?")) {
+                  setReportDialogOpen(true);
+                }
+              }}
+              title="Reportar usuario"
             >
               <Flag className="h-4 w-4" />
             </Button>
@@ -303,6 +349,7 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
               variant="ghost"
               size="sm"
               onClick={() => blockUser(selectedConversation.otherUserId)}
+              title="Bloquear usuario"
             >
               <UserX className="h-4 w-4" />
             </Button>
@@ -310,6 +357,7 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
               variant="ghost"
               size="sm"
               onClick={() => deleteConversation(selectedConversation)}
+              title="Eliminar conversación"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -406,14 +454,14 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">{conversation.otherUserName}</span>
+                      <span className="font-medium">{profiles[conversation.otherUserId]?.display_name || 'Usuario'}</span>
                       {conversation.unreadCount > 0 && (
                         <Badge variant="destructive" className="text-xs">
                           {conversation.unreadCount}
                         </Badge>
                       )}
                     </div>
-                    {conversation.postTitle && (
+                    {conversation.postTitle && conversation.postTitle !== 'Conversación general' && (
                       <p className="text-sm text-muted-foreground mb-1">
                         Sobre: {conversation.postTitle}
                       </p>

@@ -177,7 +177,7 @@ export default function Adoptions() {
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className="overflow-hidden border-l-4 border-l-primary cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/adoption/${post.id}`)}>
+            <Card key={post.id} className="overflow-hidden border-l-4 border-l-primary cursor-pointer hover:shadow-md transition" onClick={() => navigate(`/post/adoption/${post.id}`)}>
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img 

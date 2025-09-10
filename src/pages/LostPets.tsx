@@ -164,7 +164,7 @@ export default function LostPets() {
         {/* Posts Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
-            <Card key={post.id} className={`overflow-hidden ${isExpiringSoon(post.expires_at) ? 'border-destructive' : ''}`}>
+            <Card key={post.id} className={`overflow-hidden cursor-pointer hover:shadow-md transition ${isExpiringSoon(post.expires_at) ? 'border-destructive' : ''}`} onClick={() => window.location.href = `/post/lost/${post.id}`}>
               {post.images?.[0] && (
                 <div className="aspect-video bg-muted">
                   <img 
