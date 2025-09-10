@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,7 +149,33 @@ export const NewsStrip = () => {
 
   return (
     <div className="w-full py-4">
-      <h2 className="text-lg font-semibold mb-3 text-primary">{t('home.latestNews')}</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg font-semibold text-primary">{t('home.latestNews')}</h2>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollLeft -= 300;
+              }
+            }}
+          >
+            ←
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollLeft += 300;
+              }
+            }}
+          >
+            →
+          </Button>
+        </div>
+      </div>
       <div 
         ref={scrollRef}
         className="flex gap-3 overflow-hidden pb-2"

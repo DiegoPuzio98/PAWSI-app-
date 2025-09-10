@@ -115,9 +115,16 @@ export default function Dashboard() {
   const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.id.includes(searchTerm);
-    const matchesTab = activeTab === 'all' || post.type === activeTab;
-    const notClosed = post.status !== 'resolved' && post.status !== 'inactive';
-    return matchesSearch && matchesTab && notClosed;
+    const matchesTab = activeTab === 'all' || post.type === activeTab || 
+                      (activeTab === 'resolved' && (post.status === 'resolved' || (post.type === 'reported' && post.status === 'inactive')));
+    
+    if (activeTab === 'resolved') {
+      return matchesSearch && (post.status === 'resolved' || (post.type === 'reported' && post.status === 'inactive'));
+    } else if (activeTab === 'all') {
+      return matchesSearch && post.status !== 'resolved' && post.status !== 'inactive';
+    } else {
+      return matchesSearch && matchesTab && post.status !== 'resolved' && post.status !== 'inactive';
+    }
   });
 
   const getStatusColor = (status: string) => {
@@ -229,11 +236,12 @@ export default function Dashboard() {
         {/* Posts Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">Todas ({posts.length})</TabsTrigger>
-            <TabsTrigger value="adoption">Adopciones ({posts.filter(p => p.type === 'adoption').length})</TabsTrigger>
-            <TabsTrigger value="lost">Perdidas ({posts.filter(p => p.type === 'lost').length})</TabsTrigger>
-            <TabsTrigger value="reported">Reportadas ({posts.filter(p => p.type === 'reported').length})</TabsTrigger>
-            <TabsTrigger value="classified">Marketplace ({posts.filter(p => p.type === 'classified').length})</TabsTrigger>
+            <TabsTrigger value="all">Todas ({posts.filter(p => p.status !== 'resolved' && p.status !== 'inactive').length})</TabsTrigger>
+            <TabsTrigger value="adoption">Adopciones ({posts.filter(p => p.type === 'adoption' && p.status !== 'resolved' && p.status !== 'inactive').length})</TabsTrigger>
+            <TabsTrigger value="lost">Perdidas ({posts.filter(p => p.type === 'lost' && p.status !== 'resolved' && p.status !== 'inactive').length})</TabsTrigger>
+            <TabsTrigger value="reported">Reportadas ({posts.filter(p => p.type === 'reported' && p.status !== 'resolved' && p.status !== 'inactive').length})</TabsTrigger>
+            <TabsTrigger value="classified">Marketplace ({posts.filter(p => p.type === 'classified' && p.status !== 'resolved' && p.status !== 'inactive').length})</TabsTrigger>
+            <TabsTrigger value="resolved">Resueltas ({posts.filter(p => p.status === 'resolved' || (p.type === 'reported' && p.status === 'inactive')).length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-6">
@@ -270,31 +278,52 @@ export default function Dashboard() {
                       </div>
                       
                       <div className="flex gap-2">
-                        {post.status === 'active' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updatePostStatus(post.id, post.type, 'resolved')}
-                          >
-                            Marcar Resuelta
-                          </Button>
+                        {activeTab === 'resolved' ? (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updatePostStatus(post.id, post.type, 'active')}
+                            >
+                              Publicar de nuevo
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deletePost(post.id, post.type)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </>
+                        ) : (
+                          <>
+                            {post.status === 'active' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updatePostStatus(post.id, post.type, 'resolved')}
+                              >
+                                Marcar Resuelta
+                              </Button>
+                            )}
+                            {post.status === 'resolved' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => updatePostStatus(post.id, post.type, 'active')}
+                              >
+                                Reactivar
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deletePost(post.id, post.type)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </>
                         )}
-                        {post.status === 'resolved' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updatePostStatus(post.id, post.type, 'active')}
-                          >
-                            Reactivar
-                          </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => deletePost(post.id, post.type)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
                       </div>
                     </div>
                   </CardContent>

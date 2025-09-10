@@ -177,16 +177,46 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
 
       if (error) throw error;
 
-      toast({ title: "Mensaje enviado", description: "Tu mensaje ha sido enviado correctamente." });
-      
+      // Create the new message object for immediate UI update
+      const newMessage: Message = {
+        id: Date.now().toString(), // temporary ID
+        sender_id: user.id,
+        recipient_id: targetRecipientId!,
+        post_id: isNewConversation ? postId : conversationPostId,
+        post_type: isNewConversation ? postType : conversationPostType,
+        subject: messageSubject,
+        content: messageContent,
+        created_at: new Date().toISOString()
+      };
+
       if (isNewConversation) {
         setNewMessageOpen(false);
         setSubject("");
         setContent("");
       } else {
+        // Immediately update the selected conversation with the new message
+        if (selectedConversation) {
+          const updatedConversation = {
+            ...selectedConversation,
+            messages: [...selectedConversation.messages, newMessage],
+            lastMessageTime: newMessage.created_at
+          };
+          setSelectedConversation(updatedConversation);
+          
+          // Update conversations list
+          setConversations(prevConversations => 
+            prevConversations.map(conv => 
+              conv.otherUserId === selectedConversation.otherUserId && 
+              conv.postId === selectedConversation.postId
+                ? updatedConversation 
+                : conv
+            )
+          );
+        }
         setNewMessageContent("");
       }
       
+      // Refresh conversations to get the real message from database
       fetchConversations();
     } catch (error: any) {
       toast({ title: "Error", description: error.message });

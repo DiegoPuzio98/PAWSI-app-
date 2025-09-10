@@ -15,6 +15,7 @@ import { SensitiveImage } from "@/components/SensitiveImage";
 import { ReportDialog } from "@/components/ReportDialog";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { ContactOptions } from "@/components/ContactOptions";
+import { PostActions } from "@/components/PostActions";
 
 interface PostData {
   id: string;
@@ -66,6 +67,7 @@ export default function PostDetail() {
   const [reportOpen, setReportOpen] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [isHighlighted, setIsHighlighted] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -115,6 +117,30 @@ export default function PostDetail() {
 
     fetchPost();
   }, [type, id, navigate, toast]);
+
+  // Check if post is highlighted
+  useEffect(() => {
+    const checkHighlight = async () => {
+      if (!user || !id) return;
+      
+      try {
+        const { data } = await supabase
+          .from('user_highlights')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('post_id', id)
+          .eq('post_type', type === 'classifieds' ? 'classified' : type!)
+          .single();
+        
+        setIsHighlighted(!!data);
+      } catch (error) {
+        // Post is not highlighted
+        setIsHighlighted(false);
+      }
+    };
+    
+    checkHighlight();
+  }, [user, id, type]);
 
   const loadContactInfo = async () => {
     if (!user || !type || !id) {
@@ -401,6 +427,15 @@ export default function PostDetail() {
             {/* Contact Section */}
             <div className="flex flex-col gap-4">
               <h2 className="text-lg font-semibold">Información de Contacto</h2>
+              
+              {/* Save/Contact Actions */}
+              <PostActions
+                postId={id!}
+                postType={type === 'classifieds' ? 'classified' : (type as any)}
+                isHighlighted={isHighlighted}
+                onHighlightChange={setIsHighlighted}
+              />
+              
               {!contactInfo ? (
                 <Button 
                   onClick={loadContactInfo} 
