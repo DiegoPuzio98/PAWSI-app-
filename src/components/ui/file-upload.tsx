@@ -34,12 +34,13 @@ export const FileUpload = ({
 
   return (
     <div className="space-y-2">
-      <input
+        <input
         ref={fileInputRef}
         type="file"
         onChange={handleFileChange}
         multiple={multiple}
         accept={accept}
+        capture={false}
         className="hidden"
         disabled={disabled}
       />

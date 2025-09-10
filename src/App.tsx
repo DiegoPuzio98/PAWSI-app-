@@ -24,6 +24,7 @@ import VeterinariansNew from "./pages/VeterinariansNew";
 import AdoptionsNew from "./pages/AdoptionsNew";
 import PostDetail from "./pages/PostDetail";
 import Saved from "./pages/Saved";
+import Messages from "./pages/Messages";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/adoptions/new" element={<AuthGuard requireAuth={true}><AdoptionsNew /></AuthGuard>} />
               <Route path="/support" element={<Support />} />
               <Route path="/saved" element={<AuthGuard requireAuth={true}><Saved /></AuthGuard>} />
+              <Route path="/messages" element={<AuthGuard requireAuth={true}><Messages /></AuthGuard>} />
               <Route path="/:type/:id" element={<PostDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -1,20 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Stethoscope, Phone, LogOut, User, Settings, Bookmark } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Menu, Home, Camera, AlertTriangle, ShoppingCart, Heart, Stethoscope, Phone, LogOut, User, Settings, Bookmark, MessageSquare } from "lucide-react";
 import { PawIcon } from "@/components/ui/paw-icon";
 import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { supabase } from "@/integrations/supabase/client";
 
 // Remove menuItems as we'll dynamically generate them with translations
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const location = useLocation();
   const { t } = useLanguage();
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated, signOut, user } = useAuth();
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (user?.id) {
+      const fetchUnreadCount = async () => {
+        const { data } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('recipient_id', user.id)
+          .is('read_at', null);
+        
+        setUnreadCount(data?.length || 0);
+      };
+
+      fetchUnreadCount();
+      
+      // Set up real-time subscription for messages
+      const channel = supabase
+        .channel('unread-messages')
+        .on('postgres_changes', 
+          { event: '*', schema: 'public', table: 'messages' },
+          () => fetchUnreadCount()
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [user]);
 
   const menuItems = [
     { icon: Home, label: t('nav.home'), path: "/" },
@@ -28,6 +61,7 @@ export const Navigation = () => {
 
   const authMenuItems = [
     { icon: User, label: t('nav.dashboard'), path: "/dashboard" },
+    { icon: MessageSquare, label: "Mensajes", path: "/messages", showBadge: true },
     { icon: Bookmark, label: t('nav.saved'), path: "/saved" },
     { icon: Settings, label: t('nav.profile'), path: "/profile" },
   ];
@@ -93,14 +127,21 @@ export const Navigation = () => {
                         key={item.path}
                         to={item.path}
                         onClick={() => setIsOpen(false)}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                        className={`flex items-center justify-between gap-3 p-3 rounded-lg transition-colors ${
                           isActive
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-accent"
                         }`}
                       >
-                        <Icon className="h-5 w-5" />
-                        <span className="font-medium">{item.label}</span>
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-5 w-5" />
+                          <span className="font-medium">{item.label}</span>
+                        </div>
+                        {item.showBadge && unreadCount > 0 && (
+                          <Badge variant="destructive" className="ml-auto">
+                            {unreadCount}
+                          </Badge>
+                        )}
                       </Link>
                     );
                   })}

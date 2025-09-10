@@ -14,7 +14,14 @@ interface SensitiveImageProps {
 export function SensitiveImage({ src, alt, className, isSensitive = false, disableReveal = false, onError }: SensitiveImageProps) {
   const [revealed, setRevealed] = useState(false);
 
-  if (!isSensitive) {
+  // Check if image should be sensitive based on alt text or other indicators
+  const shouldBlur = isSensitive || 
+    alt.toLowerCase().includes('enfermo') || 
+    alt.toLowerCase().includes('herido') ||
+    alt.toLowerCase().includes('injured') ||
+    alt.toLowerCase().includes('sick');
+
+  if (!shouldBlur) {
     return <img src={src} alt={alt} className={className} onError={onError} />;
   }
 

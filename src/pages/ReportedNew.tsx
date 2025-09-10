@@ -40,6 +40,7 @@ export default function ReportedNew() {
   const [whatsapp, setWhatsapp] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [lostAt, setLostAt] = useState("");
   const [state, setState] = useState<string>("seen");
 
   // Captcha
@@ -85,8 +86,8 @@ export default function ReportedNew() {
   }, [user]);
 
   const onSubmit = async () => {
-    if (!title || !location) {
-      toast({ title: "Faltan campos obligatorios", description: "Título y área aproximada son requeridos" });
+    if (!title || !species || !breed || !description || !colors.length || !location || !lostAt || !state || !country || !province) {
+      toast({ title: "Faltan campos obligatorios", description: "Todos los campos marcados con * son requeridos" });
       return;
     }
     if (!user) {
@@ -140,6 +141,7 @@ export default function ReportedNew() {
         contact_phone: phone || null,
         contact_email: email || null,
         state,
+        seen_at: lostAt ? new Date(lostAt).toISOString() : null,
         owner_secret_hash,
         status: "active",
         user_id: user?.id,
@@ -165,7 +167,7 @@ export default function ReportedNew() {
       <main className="container mx-auto px-4 py-6">
         <h1 className="text-3xl font-bold text-primary mb-4">Reportar avistamiento</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Evita direcciones exactas o datos sensibles. Sube solo fotos tuyas o con permiso.
+          Aconsejamos evitar datos personales sensibles, como teléfonos, nombres y direcciones exactas.
         </p>
 
         <Card>
@@ -176,7 +178,7 @@ export default function ReportedNew() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Especie (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Especie *</label>
                  <Select value={species} onValueChange={setSpecies}>
                   <SelectTrigger>
                     <SelectValue placeholder={t('form.species')} />
@@ -189,7 +191,7 @@ export default function ReportedNew() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Raza (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Raza *</label>
                 <BreedSelector 
                   species={species}
                   breed={breed}
@@ -198,7 +200,7 @@ export default function ReportedNew() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Colores (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Colores *</label>
               <ColorSelector 
                 selectedColors={colors}
                 onColorsChange={setColors}
@@ -206,11 +208,11 @@ export default function ReportedNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Descripción *</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Ubicación *</label>
               <LocationSelector
                 country={country}
                 province={province}
@@ -226,7 +228,11 @@ export default function ReportedNew() {
                 <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Estado del avistamiento (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Fecha/hora del avistamiento *</label>
+                <Input type="datetime-local" value={lostAt} onChange={(e) => setLostAt(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Estado del avistamiento *</label>
                 <Select value={state} onValueChange={setState}>
                   <SelectTrigger>
                     <SelectValue placeholder="Estado" />
@@ -244,8 +250,9 @@ export default function ReportedNew() {
             <div>
               <label className="block text-sm font-medium mb-1">Ubicación exacta (opcional)</label>
               <p className="text-xs text-muted-foreground mb-2">
-                Permite que otros usuarios vean la ubicación aproximada en un mapa
+                Al completar este campo, consientes que la información sea visible públicamente.
               </p>
+              <ConsentAlert fieldValue={locationLat ? "ubicación" : ""} fieldType="address" />
               <MapboxPicker
                 onLocationChange={(lat, lng) => {
                   setLocationLat(lat);

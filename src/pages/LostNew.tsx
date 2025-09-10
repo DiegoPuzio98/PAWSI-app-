@@ -86,8 +86,8 @@ export default function LostNew() {
   }, [user]);
 
   const onSubmit = async () => {
-    if (!title || !location) {
-      toast({ title: "Faltan campos obligatorios", description: "Título y área aproximada son requeridos" });
+    if (!title || !species || !breed || !description || !colors.length || !location || !lostAt || !country || !province) {
+      toast({ title: "Faltan campos obligatorios", description: "Todos los campos marcados con * son requeridos" });
       return;
     }
     if (!user) {
@@ -161,7 +161,7 @@ export default function LostNew() {
       <main className="container mx-auto px-4 py-6">
         <h1 className="text-3xl font-bold text-primary mb-4">Reportar mascota perdida</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Evita direcciones exactas o datos sensibles. Sube solo fotos tuyas o con permiso.
+          Aconsejamos evitar datos personales sensibles, como teléfonos, nombres y direcciones exactas.
         </p>
 
         <Card>
@@ -172,7 +172,7 @@ export default function LostNew() {
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Especie (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Especie *</label>
                  <Select value={species} onValueChange={setSpecies}>
                   <SelectTrigger>
                     <SelectValue placeholder="Especie" />
@@ -185,7 +185,7 @@ export default function LostNew() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Raza (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Raza *</label>
                 <BreedSelector 
                   species={species}
                   breed={breed}
@@ -194,7 +194,7 @@ export default function LostNew() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Colores (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Colores *</label>
               <ColorSelector 
                 selectedColors={colors}
                 onColorsChange={setColors}
@@ -202,11 +202,11 @@ export default function LostNew() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Descripción (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Descripción *</label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Ubicación (opcional)</label>
+              <label className="block text-sm font-medium mb-1">Ubicación *</label>
               <LocationSelector
                 country={country}
                 province={province}
@@ -222,20 +222,17 @@ export default function LostNew() {
                 <ConsentAlert fieldValue={location} fieldType="address" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Fecha/hora de pérdida (opcional)</label>
+                <label className="block text-sm font-medium mb-1">Fecha/hora de pérdida *</label>
                 <Input type="datetime-local" value={lostAt} onChange={(e) => setLostAt(e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Estado de la mascota (opcional)</label>
-                <Select value={status} onValueChange={setStatus}>
+                <label className="block text-sm font-medium mb-1">Estado de la mascota *</label>
+                <Select value={status} onValueChange={setStatus} disabled={true}>
                   <SelectTrigger>
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="lost">Perdida</SelectItem>
-                    <SelectItem value="injured">Herida</SelectItem>
-                    <SelectItem value="sick">Enferma</SelectItem>
-                    <SelectItem value="dead">Fallecida</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -243,8 +240,9 @@ export default function LostNew() {
             <div>
               <label className="block text-sm font-medium mb-1">Ubicación exacta (opcional)</label>
               <p className="text-xs text-muted-foreground mb-2">
-                Permite que otros usuarios vean la ubicación aproximada en un mapa
+                Al completar este campo, consientes que la información sea visible públicamente.
               </p>
+              <ConsentAlert fieldValue={locationLat ? "ubicación" : ""} fieldType="address" />
               <MapboxPicker
                 onLocationChange={(lat, lng) => {
                   setLocationLat(lat);
