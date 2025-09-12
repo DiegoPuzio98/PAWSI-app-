@@ -26,6 +26,7 @@ import PostDetail from "./pages/PostDetail";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Terms from "./pages/Terms";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -37,29 +38,34 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
-              <Route path="/dashboard" element={<AuthGuard requireAuth={true}><Dashboard /></AuthGuard>} />
-              <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
-              <Route path="/reported" element={<ReportedPets />} />
-              <Route path="/reported/new" element={<AuthGuard requireAuth={true}><ReportedNew /></AuthGuard>} />
-              <Route path="/lost" element={<LostPets />} />
-              <Route path="/lost/new" element={<AuthGuard requireAuth={true}><LostNew /></AuthGuard>} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/marketplace/new" element={<AuthGuard requireAuth={true}><MarketplaceNew /></AuthGuard>} />
-              <Route path="/veterinarians" element={<Veterinarians />} />
-              <Route path="/veterinarians/new" element={<AuthGuard requireAuth={true}><VeterinariansNew /></AuthGuard>} />
-              <Route path="/adoptions" element={<Adoptions />} />
-              <Route path="/adoptions/new" element={<AuthGuard requireAuth={true}><AdoptionsNew /></AuthGuard>} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/saved" element={<AuthGuard requireAuth={true}><Saved /></AuthGuard>} />
-              <Route path="/messages" element={<AuthGuard requireAuth={true}><Messages /></AuthGuard>} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/post/:type/:id" element={<PostDetail />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
+                  <Route path="/dashboard" element={<AuthGuard requireAuth={true}><Dashboard /></AuthGuard>} />
+                  <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
+                  <Route path="/reported" element={<ReportedPets />} />
+                  <Route path="/reported/new" element={<AuthGuard requireAuth={true}><ReportedNew /></AuthGuard>} />
+                  <Route path="/lost" element={<LostPets />} />
+                  <Route path="/lost/new" element={<AuthGuard requireAuth={true}><LostNew /></AuthGuard>} />
+                  <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/marketplace/new" element={<AuthGuard requireAuth={true}><MarketplaceNew /></AuthGuard>} />
+                  <Route path="/veterinarians" element={<Veterinarians />} />
+                  <Route path="/veterinarians/new" element={<AuthGuard requireAuth={true}><VeterinariansNew /></AuthGuard>} />
+                  <Route path="/adoptions" element={<Adoptions />} />
+                  <Route path="/adoptions/new" element={<AuthGuard requireAuth={true}><AdoptionsNew /></AuthGuard>} />
+                  <Route path="/support" element={<Support />} />
+                  <Route path="/saved" element={<AuthGuard requireAuth={true}><Saved /></AuthGuard>} />
+                  <Route path="/messages" element={<AuthGuard requireAuth={true}><Messages /></AuthGuard>} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/post/:type/:id" element={<PostDetail />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <Footer />
+            </div>
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
