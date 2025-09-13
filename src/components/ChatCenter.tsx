@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { ReportDialog } from "@/components/ReportDialog";
-
+import { useSearchParams } from "react-router-dom";
 interface Message {
   id: string;
   sender_id: string;
@@ -60,7 +60,8 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+const messagesEndRef = useRef<HTMLDivElement>(null);
+const [searchParams] = useSearchParams();
 
   // Auto-fill subject with the post title when opening a new message dialog
   useEffect(() => {
@@ -177,6 +178,15 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
       });
 
       if (error) throw error;
+
+      // Send in-app notification to recipient
+      await supabase.functions.invoke('send-message-notification', {
+        body: {
+          recipient_id: targetRecipientId!,
+          sender_id: user.id,
+          message_subject: messageSubject
+        }
+      });
 
       // Create the new message object for immediate UI update
       const newMessage: Message = {
@@ -312,6 +322,19 @@ export function ChatCenter({ postId, postType, recipientId, postTitle }: ChatCen
   useEffect(() => {
     fetchConversations();
   }, [user]);
+
+  // Open conversation when arriving with ?from=<userId>
+  useEffect(() => {
+    const from = searchParams.get('from');
+    if (from && conversations.length > 0 && !selectedConversation) {
+      const conv = conversations.find((c) => c.otherUserId === from);
+      if (conv) {
+        setSelectedConversation(conv);
+        // Mark any unread messages as read
+        markAsRead(conv.messages);
+      }
+    }
+  }, [conversations, searchParams, selectedConversation]);
 
   // Auto-scroll to bottom when conversation changes or new messages arrive
   useEffect(() => {

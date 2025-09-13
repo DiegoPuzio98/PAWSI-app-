@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-
+import { useNavigate } from "react-router-dom";
 interface Notification {
   id: string;
   type: string;
@@ -19,10 +19,10 @@ interface Notification {
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
-
   useEffect(() => {
     if (!user) return;
 
@@ -171,6 +171,10 @@ export function NotificationBell() {
                   onClick={() => {
                     if (!notification.read) {
                       markAsRead(notification.id);
+                    }
+                    setOpen(false);
+                    if (notification.type === 'new_message' && notification.meta?.sender_id) {
+                      navigate(`/messages?from=${notification.meta.sender_id}`);
                     }
                   }}
                 >
