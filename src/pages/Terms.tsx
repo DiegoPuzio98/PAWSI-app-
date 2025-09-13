@@ -24,6 +24,17 @@ export default function Terms() {
               Para mayor seguridad, recomendamos usar el sistema de mensajería interno de Pawsi 
               antes de compartir información personal directa.
             </p>
+            <h3 className="text-lg font-semibold mb-2">Comunicación y Mensajería</h3>
+            <p className="mb-4">
+              Los usuarios pueden comunicarse entre sí a través del sistema de mensajería interno de la plataforma. 
+              Toda comunicación debe ser respetuosa y relacionada con los animales publicados.
+            </p>
+            <p className="mb-4 text-sm bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+              <strong>Importante:</strong> Los mensajes y conversaciones reportadas por usuarios pueden ser revisados por nuestro equipo de moderación 
+              con fines de seguridad, protección de usuarios y cumplimiento de estos términos de uso. Al usar nuestro sistema de mensajería, 
+              aceptas que tus comunicaciones pueden ser supervisadas cuando sean objeto de reportes por comportamiento inapropiado.
+            </p>
+            
             <h3 className="text-lg font-bold mb-2">Sistema de Moderación y Seguridad</h3>
             <p className="mb-4">
               Los chats y publicaciones reportados pueden ser revisados por el sistema de moderación de Pawsi, 

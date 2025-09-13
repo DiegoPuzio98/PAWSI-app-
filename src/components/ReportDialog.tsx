@@ -44,34 +44,54 @@ export function ReportDialog({ open, onOpenChange, postId, postType }: ReportDia
       return;
     }
 
-    setSubmitting(true);
+    const reasonLabels: Record<string, string> = {
+      'spam': 'Spam o contenido repetitivo',
+      'inappropriate': 'Contenido inapropiado',
+      'fake': 'Información falsa',
+      'animal_abuse': 'Posible maltrato animal',
+      'commercial': 'Venta comercial no permitida',
+      'offensive': 'Contenido ofensivo',
+      'personal_data': 'Exposición de datos personales',
+      'other': 'Otro motivo'
+    };
+
+    // Create email body
+    const emailSubject = `Reporte: ${reasonLabels[reason] || reason}`;
+    const emailBody = `Hola,
+
+He reportado contenido en Pawsi por el siguiente motivo:
+
+MOTIVO: ${reasonLabels[reason] || reason}
+TIPO DE CONTENIDO: ${postType}
+ID DEL CONTENIDO: ${postId}
+${description ? `DESCRIPCIÓN ADICIONAL: ${description}` : ''}
+USUARIO REPORTANTE: ${user?.id || 'Anónimo'}
+
+Por favor revisa este contenido y toma las medidas necesarias.
+
+Gracias.`;
+
+    // Open email client with pre-filled data
+    const mailtoLink = `mailto:ecomervix@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    window.open(mailtoLink);
+
+    // Store report in database for admin tracking
     try {
-      // Use the new report-content edge function
-      const reportResponse = await supabase.functions.invoke('report-content', {
-        body: {
-          content_type: postType,
-          content_id: postId,
-          reason,
-          message: description || null,
-          reporter_id: user?.id || null,
-        }
+      await supabase.from('post_reports').insert({
+        post_type: postType,
+        post_id: postId,
+        reason,
+        description: description || null,
+        reporter_user_id: user?.id || null,
       });
-
-      if (reportResponse.error) {
-        console.error('Report submission error:', reportResponse.error);
-        throw reportResponse.error;
-      }
-
-      toast({ title: "Reporte enviado", description: "Gracias por ayudar a mantener la comunidad segura." });
-      onOpenChange(false);
-      setReason("");
-      setDescription("");
-    } catch (error: any) {
-      console.error('Error submitting report:', error);
-      toast({ title: "Error", description: "No se pudo enviar el reporte. Intenta nuevamente." });
-    } finally {
-      setSubmitting(false);
+    } catch (error) {
+      console.error('Error storing report:', error);
     }
+
+    toast({ title: "Reporte enviado", description: "Se ha abierto tu cliente de email. Envía el email para completar el reporte." });
+    onOpenChange(false);
+    setReason("");
+    setDescription("");
   };
 
   return (

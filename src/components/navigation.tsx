@@ -101,8 +101,8 @@ export const Navigation = () => {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-          <SheetContent>
-            <div className="flex flex-col gap-4 mt-8">
+          <SheetContent className="overflow-y-auto">
+            <div className="flex flex-col gap-4 mt-8 pb-20">
               {menuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;

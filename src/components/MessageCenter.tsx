@@ -107,6 +107,15 @@ export function MessageCenter({ postId, postType, recipientId }: MessageCenterPr
 
       if (error) throw error;
 
+      // Send notification to recipient
+      await supabase.functions.invoke('send-message-notification', {
+        body: {
+          recipient_id: recipientId,
+          sender_id: user.id,
+          message_subject: subject
+        }
+      });
+
       toast({ title: "Mensaje enviado", description: "Tu mensaje ha sido enviado correctamente." });
       setNewMessageOpen(false);
       setSubject("");

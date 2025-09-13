@@ -112,6 +112,10 @@ export function NotificationBell() {
         return '✅';
       case 'report_received':
         return '📢';
+      case 'new_message':
+        return '💬';
+      case 'post_expired':
+        return '⌛';
       default:
         return '📩';
     }
