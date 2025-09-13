@@ -3,8 +3,10 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Loader2, MapPin, X, Search } from "lucide-react";
-
+import { Loader2, MapPin, X, Search, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 // Set Mapbox access token
 mapboxgl.accessToken = "pk.eyJ1IjoiZGllZ29wMDA5OCIsImEiOiJjbWZha3A0MmgxYWcxMm1wa3p1dW13aHczIn0.UMYPIYk7DziVJNkBe3v-2A";
 
@@ -19,11 +21,22 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markerRef = useRef<mapboxgl.Marker | null>(null);
 
+  const { user } = useAuth();
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [showManualSelection, setShowManualSelection] = useState(false);
+
+  // Region context derived from user profile
+  const [regionQuery, setRegionQuery] = useState<string | null>(null);
+  const [regionBBox, setRegionBBox] = useState<number[] | null>(null); // [minX, minY, maxX, maxY]
+  const [departamentos, setDepartamentos] = useState<{ name: string; bbox?: number[] }[]>([]);
+  const [municipios, setMunicipios] = useState<{ name: string; bbox?: number[] }[]>([]);
+  const [selectedDepartamento, setSelectedDepartamento] = useState<string>("");
+  const [selectedMunicipio, setSelectedMunicipio] = useState<string>("");
+  const [hasMarker, setHasMarker] = useState<boolean>(false);
 
   // Keep a stable reference to the callback to avoid re-initializing the map
   const callbackRef = useRef(onLocationChange);
@@ -83,6 +96,53 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     };
   }, []);
 
+  // Cargar región desde el perfil y centrar el mapa; precargar departamentos/municipios
+  useEffect(() => {
+    const loadRegion = async () => {
+      if (!user) return;
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('country, province')
+          .eq('id', user.id)
+          .single();
+
+        const region = [profile?.province, profile?.country].filter(Boolean).join(', ');
+        if (!region) return;
+        setRegionQuery(region);
+
+        // Geocodificar región para obtener centro y bbox
+        const regionRes = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(region)}.json?types=place,region&access_token=${mapboxgl.accessToken}&limit=1`);
+        const regionJson = await regionRes.json();
+        const regionFeature = regionJson.features?.[0];
+        if (regionFeature) {
+          const bbox = regionFeature.bbox as number[] | undefined;
+          if (bbox) setRegionBBox(bbox);
+          const center = regionFeature.center as [number, number];
+          if (mapRef.current && center) {
+            mapRef.current.flyTo({ center, zoom: 10 });
+          }
+        }
+
+        // Precargar departamentos (districts) y municipios (place/locality) dentro de la región
+        const bboxParam = (regionFeature?.bbox as number[] | undefined)?.join(',');
+        const commonParams = `access_token=${mapboxgl.accessToken}&limit=10${bboxParam ? `&bbox=${bboxParam}` : ''}`;
+
+        const [deptRes, muniRes] = await Promise.all([
+          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(profile?.province || '')}.json?types=district&${commonParams}`),
+          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(profile?.province || '')}.json?types=place,locality&${commonParams}`)
+        ]);
+        const deptJson = await deptRes.json();
+        const muniJson = await muniRes.json();
+        setDepartamentos((deptJson.features || []).map((f: any) => ({ name: f.text, bbox: f.bbox })));
+        setMunicipios((muniJson.features || []).map((f: any) => ({ name: f.text, bbox: f.bbox })));
+      } catch (e) {
+        console.warn('No se pudo cargar la región del perfil', e);
+      }
+    };
+    loadRegion();
+  }, [user]);
+
   const placeMarker = (lngLat: [number, number]) => {
     if (!mapRef.current) return;
     if (markerRef.current) {
@@ -91,6 +151,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     markerRef.current = new mapboxgl.Marker()
       .setLngLat(lngLat)
       .addTo(mapRef.current);
+    setHasMarker(true);
   };
 
   const clearLocation = () => {
@@ -98,9 +159,9 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
       markerRef.current.remove();
     }
     markerRef.current = null;
+    setHasMarker(false);
     callbackRef.current?.(null, null);
   };
-
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       setLoading(true);
@@ -126,12 +187,19 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
 
   const searchLocation = async () => {
     if (!searchQuery.trim()) return;
-    
     setIsSearching(true);
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${mapboxgl.accessToken}&limit=1`
-      );
+      // Construir consulta contextualizada por municipio/departamento/región
+      const contextParts = [
+        selectedMunicipio || '',
+        selectedDepartamento || '',
+        regionQuery || ''
+      ].filter(Boolean);
+      const fullQuery = [searchQuery.trim(), contextParts.join(', ')].filter(Boolean).join(', ');
+
+      const bboxParam = regionBBox ? `&bbox=${regionBBox.join(',')}` : '';
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullQuery)}.json?types=address,poi,neighborhood,locality,place&access_token=${mapboxgl.accessToken}&limit=1${bboxParam}`;
+      const response = await fetch(url);
       const data = await response.json();
       
       if (data.features && data.features.length > 0) {
@@ -174,13 +242,38 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
       </div>
       
       {showManualSelection && (
-        <div className="space-y-2 p-3 bg-muted rounded-lg">
+        <div className="space-y-3 p-3 bg-muted rounded-lg">
           <p className="text-sm text-muted-foreground">
-            Busca una dirección o haz clic en el mapa para seleccionar una ubicación
+            Busca una dirección o haz clic en el mapa para seleccionar una ubicación. El buscador está limitado a tu ciudad.
           </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <Select value={selectedDepartamento} onValueChange={(v) => setSelectedDepartamento(v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Departamento" />
+              </SelectTrigger>
+              <SelectContent>
+                {departamentos.map((d) => (
+                  <SelectItem key={d.name} value={d.name}>{d.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedMunicipio} onValueChange={(v) => setSelectedMunicipio(v)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Municipio" />
+              </SelectTrigger>
+              <SelectContent>
+                {municipios.map((m) => (
+                  <SelectItem key={m.name} value={m.name}>{m.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex gap-2">
             <Input
-              placeholder="Buscar dirección..."
+              placeholder={`Buscar en ${regionQuery || 'tu zona'}`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && searchLocation()}
@@ -198,6 +291,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           </div>
         </div>
       )}
+
       {error && (
         <p className="text-sm text-destructive">{error}</p>
       )}
@@ -207,6 +301,22 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
         className="relative w-full bg-muted"
         aria-label="Seleccionar ubicación en mapa"
       />
+      {showManualSelection && hasMarker && (
+        <div className="flex justify-end mt-2">
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => {
+              const pos = markerRef.current?.getLngLat();
+              if (pos) {
+                callbackRef.current?.(pos.lat, pos.lng);
+              }
+            }}
+          >
+            <Check className="h-4 w-4 mr-2" /> Confirmar ubicación
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
