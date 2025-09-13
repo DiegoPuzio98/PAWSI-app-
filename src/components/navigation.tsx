@@ -8,6 +8,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { NotificationBell } from "@/components/NotificationBell";
 import { supabase } from "@/integrations/supabase/client";
 
 // Remove menuItems as we'll dynamically generate them with translations
@@ -66,6 +67,11 @@ export const Navigation = () => {
     { icon: Settings, label: t('nav.profile'), path: "/profile" },
   ];
 
+  // Add admin menu item for admin users
+  if (user?.email === 'ecomervix@gmail.com') {
+    authMenuItems.push({ icon: Settings, label: "Panel Admin", path: "/admin" });
+  }
+
   return (
     <header className="sticky top-0 z-50 bg-background border-b shadow-sm">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -76,6 +82,7 @@ export const Navigation = () => {
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
+          <NotificationBell />
           {!isAuthenticated ? (
             <Link to="/auth">
               <Button variant="outline" size="sm">

@@ -26,6 +26,7 @@ import PostDetail from "./pages/PostDetail";
 import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Terms from "./pages/Terms";
+import AdminPanel from "./pages/AdminPanel";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
                   <Route path="/saved" element={<AuthGuard requireAuth={true}><Saved /></AuthGuard>} />
                   <Route path="/messages" element={<AuthGuard requireAuth={true}><Messages /></AuthGuard>} />
                   <Route path="/terms" element={<Terms />} />
+                  <Route path="/admin" element={<AuthGuard requireAuth={true}><AdminPanel /></AuthGuard>} />
                   <Route path="/post/:type/:id" element={<PostDetail />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

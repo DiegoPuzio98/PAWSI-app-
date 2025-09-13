@@ -16,7 +16,11 @@ interface ReportDialogProps {
 }
 
 const reportReasons = [
+  { value: 'spam', label: 'Spam o contenido repetitivo' },
   { value: 'inappropriate', label: 'Contenido inapropiado' },
+  { value: 'fake', label: 'Información falsa' },
+  { value: 'animal_abuse', label: 'Posible maltrato animal' },
+  { value: 'commercial', label: 'Venta comercial no permitida' },
   { value: 'offensive', label: 'Contenido ofensivo' },
   { value: 'personal_data', label: 'Exposición de datos personales' },
   { value: 'other', label: 'Otro motivo' }
@@ -42,34 +46,21 @@ export function ReportDialog({ open, onOpenChange, postId, postType }: ReportDia
 
     setSubmitting(true);
     try {
-      // Send email report
-      const reportResponse = await supabase.functions.invoke('send-post-report', {
+      // Use the new report-content edge function
+      const reportResponse = await supabase.functions.invoke('report-content', {
         body: {
-          postId,
-          postType,
+          content_type: postType,
+          content_id: postId,
           reason,
-          description: description || null,
-          reporterEmail: user?.email || null
+          message: description || null,
+          reporter_id: user?.id || null,
         }
       });
 
       if (reportResponse.error) {
-        console.error('Email report error:', reportResponse.error);
-        // Continue with database report even if email fails
+        console.error('Report submission error:', reportResponse.error);
+        throw reportResponse.error;
       }
-
-      // Also save to database for record-keeping
-      const { error } = await supabase
-        .from('post_reports')
-        .insert({
-          post_id: postId,
-          post_type: postType,
-          reason,
-          description: description || null,
-          reporter_user_id: user?.id || null
-        });
-
-      if (error) throw error;
 
       toast({ title: "Reporte enviado", description: "Gracias por ayudar a mantener la comunidad segura." });
       onOpenChange(false);

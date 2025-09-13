@@ -149,6 +149,33 @@ export type Database = {
         }
         Relationships: []
       }
+      deletion_logs: {
+        Row: {
+          content_id: string
+          content_type: string
+          deleted_at: string | null
+          deleted_by: string | null
+          id: string
+          processed: boolean | null
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          processed?: boolean | null
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          id?: string
+          processed?: boolean | null
+        }
+        Relationships: []
+      }
       lost_posts: {
         Row: {
           breed: string | null
@@ -260,6 +287,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          meta: Json | null
+          read: boolean | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          meta?: Json | null
+          read?: boolean | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          meta?: Json | null
+          read?: boolean | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       post_reports: {
         Row: {
           created_at: string
@@ -269,6 +326,8 @@ export type Database = {
           post_type: string
           reason: string
           reporter_user_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -281,6 +340,8 @@ export type Database = {
           post_type: string
           reason: string
           reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -293,6 +354,8 @@ export type Database = {
           post_type?: string
           reason?: string
           reporter_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
