@@ -47,11 +47,36 @@ export function NotificationBell() {
           }
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          const updated = payload.new as Notification;
+          setNotifications(prev => prev.map(n => n.id === updated.id ? updated : n));
+          // Recompute unread count safely
+          setUnreadCount(prev => {
+            const current = notifications.map(n => n.id === updated.id ? updated : n);
+            return current.filter(n => !n.read).length;
+          });
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
+  }, [user]);
+
+  // Fallback polling to guarantee updates even if Realtime is unavailable
+  useEffect(() => {
+    if (!user) return;
+    const id = setInterval(() => { fetchNotifications(); }, 10000);
+    return () => clearInterval(id);
   }, [user]);
 
   const fetchNotifications = async () => {

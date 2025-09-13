@@ -32,6 +32,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
   // Region context derived from user profile
   const [regionQuery, setRegionQuery] = useState<string | null>(null);
   const [regionBBox, setRegionBBox] = useState<number[] | null>(null); // [minX, minY, maxX, maxY]
+  const [searchBBox, setSearchBBox] = useState<number[] | null>(null); // active bbox filter (municipio/departamento)
   const [departamentos, setDepartamentos] = useState<{ name: string; bbox?: number[] }[]>([]);
   const [municipios, setMunicipios] = useState<{ name: string; bbox?: number[] }[]>([]);
   const [selectedDepartamento, setSelectedDepartamento] = useState<string>("");
@@ -126,22 +127,77 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
 
         // Precargar departamentos (districts) y municipios (place/locality) dentro de la región
         const bboxParam = (regionFeature?.bbox as number[] | undefined)?.join(',');
-        const commonParams = `access_token=${mapboxgl.accessToken}&limit=10${bboxParam ? `&bbox=${bboxParam}` : ''}`;
+        const commonParams = `access_token=${mapboxgl.accessToken}&limit=10${bboxParam ? `&bbox=${bboxParam}` : ''}&language=es`;
 
-        const [deptRes, muniRes] = await Promise.all([
-          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(profile?.province || '')}.json?types=district&${commonParams}`),
-          fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(profile?.province || '')}.json?types=place,locality&${commonParams}`)
-        ]);
-        const deptJson = await deptRes.json();
-        const muniJson = await muniRes.json();
-        setDepartamentos((deptJson.features || []).map((f: any) => ({ name: f.text, bbox: f.bbox })));
-        setMunicipios((muniJson.features || []).map((f: any) => ({ name: f.text, bbox: f.bbox })));
+        // Hacemos varias consultas semilla para cubrir más resultados
+        const seeds = ['a','e','i','o','u'];
+        const deptFetches = seeds.map((s) => fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?types=district&${commonParams}`));
+        const muniFetches = seeds.map((s) => fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?types=place,locality&${commonParams}`));
+
+        const deptResponses = await Promise.allSettled(deptFetches);
+        const muniResponses = await Promise.allSettled(muniFetches);
+
+        const deptFeatures: any[] = [];
+        deptResponses.forEach((res) => {
+          if (res.status === 'fulfilled') {
+            res.value.json().then((j) => {
+              (j.features || []).forEach((f: any) => deptFeatures.push(f));
+            });
+          }
+        });
+
+        const muniFeatures: any[] = [];
+        muniResponses.forEach((res) => {
+          if (res.status === 'fulfilled') {
+            res.value.json().then((j) => {
+              (j.features || []).forEach((f: any) => muniFeatures.push(f));
+            });
+          }
+        });
+
+        // Esperar a que todas las conversiones a json terminen
+        await new Promise((resolve) => setTimeout(resolve, 250));
+
+        // Unificar por nombre único
+        const deptMap = new Map<string, { name: string; bbox?: number[] }>();
+        deptFeatures.forEach((f: any) => {
+          const name = f.text as string;
+          if (!deptMap.has(name)) deptMap.set(name, { name, bbox: f.bbox });
+        });
+
+        const muniMap = new Map<string, { name: string; bbox?: number[] }>();
+        muniFeatures.forEach((f: any) => {
+          const name = f.text as string;
+          if (!muniMap.has(name)) muniMap.set(name, { name, bbox: f.bbox });
+        });
+
+        setDepartamentos(Array.from(deptMap.values()).sort((a,b) => a.name.localeCompare(b.name)));
+        setMunicipios(Array.from(muniMap.values()).sort((a,b) => a.name.localeCompare(b.name)));
       } catch (e) {
         console.warn('No se pudo cargar la región del perfil', e);
       }
     };
     loadRegion();
   }, [user]);
+
+  // Actualizar bbox de búsqueda al seleccionar departamento/municipio
+  useEffect(() => {
+    const setBboxFor = async () => {
+      const targetName = selectedMunicipio || selectedDepartamento;
+      if (!targetName || !regionQuery) { setSearchBBox(regionBBox); return; }
+      try {
+        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(`${targetName}, ${regionQuery}`)}.json?types=place,locality,district&access_token=${mapboxgl.accessToken}&limit=1`;
+        const res = await fetch(url);
+        const json = await res.json();
+        const f = json.features?.[0];
+        if (f?.bbox) setSearchBBox(f.bbox);
+        else setSearchBBox(regionBBox);
+      } catch (e) {
+        setSearchBBox(regionBBox);
+      }
+    };
+    setBboxFor();
+  }, [selectedMunicipio, selectedDepartamento, regionQuery, regionBBox]);
 
   const placeMarker = (lngLat: [number, number]) => {
     if (!mapRef.current) return;
@@ -197,7 +253,8 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
       ].filter(Boolean);
       const fullQuery = [searchQuery.trim(), contextParts.join(', ')].filter(Boolean).join(', ');
 
-      const bboxParam = regionBBox ? `&bbox=${regionBBox.join(',')}` : '';
+      const bboxBase = (searchBBox || regionBBox);
+      const bboxParam = bboxBase ? `&bbox=${bboxBase.join(',')}` : '';
       const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullQuery)}.json?types=address,poi,neighborhood,locality,place&access_token=${mapboxgl.accessToken}&limit=1${bboxParam}`;
       const response = await fetch(url);
       const data = await response.json();
