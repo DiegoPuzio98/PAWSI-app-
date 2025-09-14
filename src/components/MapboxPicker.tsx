@@ -111,7 +111,7 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           const bbox = regionFeature.bbox as number[] | undefined;
           if (bbox) setRegionBBox(bbox);
           const center = regionFeature.center as [number, number];
-          if (mapRef.current && center) {
+          if (mapRef.current && center && !markerRef.current) {
             mapRef.current.flyTo({ center, zoom: 10 });
           }
         }
