@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, X, Search, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 // Set Mapbox access token
 mapboxgl.accessToken = "pk.eyJ1IjoiZGllZ29wMDA5OCIsImEiOiJjbWZha3A0MmgxYWcxMm1wa3p1dW13aHczIn0.UMYPIYk7DziVJNkBe3v-2A";
 
@@ -33,10 +33,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
   const [regionQuery, setRegionQuery] = useState<string | null>(null);
   const [regionBBox, setRegionBBox] = useState<number[] | null>(null); // [minX, minY, maxX, maxY]
   const [searchBBox, setSearchBBox] = useState<number[] | null>(null); // active bbox filter (municipio/departamento)
-  const [departamentos, setDepartamentos] = useState<{ name: string; bbox?: number[] }[]>([]);
-  const [municipios, setMunicipios] = useState<{ name: string; bbox?: number[] }[]>([]);
-  const [selectedDepartamento, setSelectedDepartamento] = useState<string>("");
-  const [selectedMunicipio, setSelectedMunicipio] = useState<string>("");
   const [hasMarker, setHasMarker] = useState<boolean>(false);
 
   // Keep a stable reference to the callback to avoid re-initializing the map
@@ -125,54 +121,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           }
         }
 
-        // Precargar departamentos (districts) y municipios (place/locality) dentro de la región
-        const bboxParam = (regionFeature?.bbox as number[] | undefined)?.join(',');
-        const commonParams = `access_token=${mapboxgl.accessToken}&limit=10${bboxParam ? `&bbox=${bboxParam}` : ''}&language=es`;
-
-        // Hacemos varias consultas semilla para cubrir más resultados
-        const seeds = ['a','e','i','o','u'];
-        const deptFetches = seeds.map((s) => fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?types=district&${commonParams}`));
-        const muniFetches = seeds.map((s) => fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(s)}.json?types=place,locality&${commonParams}`));
-
-        const deptResponses = await Promise.allSettled(deptFetches);
-        const muniResponses = await Promise.allSettled(muniFetches);
-
-        const deptFeatures: any[] = [];
-        deptResponses.forEach((res) => {
-          if (res.status === 'fulfilled') {
-            res.value.json().then((j) => {
-              (j.features || []).forEach((f: any) => deptFeatures.push(f));
-            });
-          }
-        });
-
-        const muniFeatures: any[] = [];
-        muniResponses.forEach((res) => {
-          if (res.status === 'fulfilled') {
-            res.value.json().then((j) => {
-              (j.features || []).forEach((f: any) => muniFeatures.push(f));
-            });
-          }
-        });
-
-        // Esperar a que todas las conversiones a json terminen
-        await new Promise((resolve) => setTimeout(resolve, 250));
-
-        // Unificar por nombre único
-        const deptMap = new Map<string, { name: string; bbox?: number[] }>();
-        deptFeatures.forEach((f: any) => {
-          const name = f.text as string;
-          if (!deptMap.has(name)) deptMap.set(name, { name, bbox: f.bbox });
-        });
-
-        const muniMap = new Map<string, { name: string; bbox?: number[] }>();
-        muniFeatures.forEach((f: any) => {
-          const name = f.text as string;
-          if (!muniMap.has(name)) muniMap.set(name, { name, bbox: f.bbox });
-        });
-
-        setDepartamentos(Array.from(deptMap.values()).sort((a,b) => a.name.localeCompare(b.name)));
-        setMunicipios(Array.from(muniMap.values()).sort((a,b) => a.name.localeCompare(b.name)));
       } catch (e) {
         console.warn('No se pudo cargar la región del perfil', e);
       }
@@ -180,24 +128,10 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     loadRegion();
   }, [user]);
 
-  // Actualizar bbox de búsqueda al seleccionar departamento/municipio
+  // Mantener búsqueda limitada a la región del perfil
   useEffect(() => {
-    const setBboxFor = async () => {
-      const targetName = selectedMunicipio || selectedDepartamento;
-      if (!targetName || !regionQuery) { setSearchBBox(regionBBox); return; }
-      try {
-        const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(`${targetName}, ${regionQuery}`)}.json?types=place,locality,district&access_token=${mapboxgl.accessToken}&limit=1`;
-        const res = await fetch(url);
-        const json = await res.json();
-        const f = json.features?.[0];
-        if (f?.bbox) setSearchBBox(f.bbox);
-        else setSearchBBox(regionBBox);
-      } catch (e) {
-        setSearchBBox(regionBBox);
-      }
-    };
-    setBboxFor();
-  }, [selectedMunicipio, selectedDepartamento, regionQuery, regionBBox]);
+    setSearchBBox(regionBBox);
+  }, [regionBBox]);
 
   const placeMarker = (lngLat: [number, number]) => {
     if (!mapRef.current) return;
@@ -245,10 +179,8 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     try {
-      // Construir consulta contextualizada por municipio/departamento/región
+      // Construir consulta contextualizada por la región del perfil
       const contextParts = [
-        selectedMunicipio || '',
-        selectedDepartamento || '',
         regionQuery || ''
       ].filter(Boolean);
       const fullQuery = [searchQuery.trim(), contextParts.join(', ')].filter(Boolean).join(', ');
@@ -304,29 +236,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
             Busca una dirección o haz clic en el mapa para seleccionar una ubicación. El buscador está limitado a tu ciudad.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <Select value={selectedDepartamento} onValueChange={(v) => setSelectedDepartamento(v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Departamento" />
-              </SelectTrigger>
-              <SelectContent>
-                {departamentos.map((d) => (
-                  <SelectItem key={d.name} value={d.name}>{d.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={selectedMunicipio} onValueChange={(v) => setSelectedMunicipio(v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Municipio" />
-              </SelectTrigger>
-              <SelectContent>
-                {municipios.map((m) => (
-                  <SelectItem key={m.name} value={m.name}>{m.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           <div className="flex gap-2">
             <Input
