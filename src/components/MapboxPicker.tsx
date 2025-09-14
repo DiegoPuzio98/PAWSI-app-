@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2, MapPin, X, Search, Check } from "lucide-react";
+import { Loader2, MapPin, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -25,14 +24,10 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [showManualSelection, setShowManualSelection] = useState(false);
 
   // Region context derived from user profile
   const [regionQuery, setRegionQuery] = useState<string | null>(null);
-  const [regionBBox, setRegionBBox] = useState<number[] | null>(null); // [minX, minY, maxX, maxY]
-  const [searchBBox, setSearchBBox] = useState<number[] | null>(null); // active bbox filter (municipio/departamento)
+  const [regionBBox, setRegionBBox] = useState<number[] | null>(null);
   const [hasMarker, setHasMarker] = useState<boolean>(false);
 
   // Keep a stable reference to the callback to avoid re-initializing the map
@@ -128,10 +123,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     loadRegion();
   }, [user]);
 
-  // Mantener búsqueda limitada a la región del perfil
-  useEffect(() => {
-    setSearchBBox(regionBBox);
-  }, [regionBBox]);
 
   const placeMarker = (lngLat: [number, number]) => {
     if (!mapRef.current) return;
@@ -175,38 +166,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
     }
   };
 
-  const searchLocation = async () => {
-    if (!searchQuery.trim()) return;
-    setIsSearching(true);
-    try {
-      // Construir consulta contextualizada por la región del perfil
-      const contextParts = [
-        regionQuery || ''
-      ].filter(Boolean);
-      const fullQuery = [searchQuery.trim(), contextParts.join(', ')].filter(Boolean).join(', ');
-
-      const bboxBase = (searchBBox || regionBBox);
-      const bboxParam = bboxBase ? `&bbox=${bboxBase.join(',')}` : '';
-      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(fullQuery)}.json?types=address,poi,neighborhood,locality,place&access_token=${mapboxgl.accessToken}&limit=1${bboxParam}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (data.features && data.features.length > 0) {
-        const [lng, lat] = data.features[0].center;
-        placeMarker([lng, lat]);
-        callbackRef.current?.(lat, lng);
-        mapRef.current?.flyTo({ center: [lng, lat], zoom: 14 });
-        setError(null);
-      } else {
-        setError("No se encontró la ubicación");
-      }
-    } catch (err) {
-      console.error("Search error:", err);
-      setError("Error al buscar la ubicación");
-    } finally {
-      setIsSearching(false);
-    }
-  };
 
   return (
     <div className="space-y-2">
@@ -215,48 +174,14 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
           {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <MapPin className="h-4 w-4 mr-2" />}
           {loading ? "Obteniendo ubicación..." : "Usar mi ubicación"}
         </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm" 
-          onClick={() => setShowManualSelection(!showManualSelection)}
-          disabled={disabled}
-        >
-          <Search className="h-4 w-4 mr-2" />
-          Seleccionar manualmente
-        </Button>
         <Button type="button" variant="ghost" size="sm" onClick={clearLocation} disabled={disabled}>
           <X className="h-4 w-4 mr-1" /> Limpiar
         </Button>
       </div>
       
-      {showManualSelection && (
-        <div className="space-y-3 p-3 bg-muted rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            Busca una dirección o haz clic en el mapa para seleccionar una ubicación. El buscador está limitado a tu ciudad.
-          </p>
-
-
-          <div className="flex gap-2">
-            <Input
-              placeholder={`Buscar en ${regionQuery || 'tu zona'}`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && searchLocation()}
-              disabled={disabled || isSearching}
-            />
-            <Button 
-              type="button" 
-              variant="outline" 
-              size="sm" 
-              onClick={searchLocation}
-              disabled={disabled || isSearching || !searchQuery.trim()}
-            >
-              {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-      )}
+      <p className="text-sm text-muted-foreground">
+        Haz clic en el mapa para seleccionar una ubicación o usa tu ubicación actual.
+      </p>
 
       {error && (
         <p className="text-sm text-destructive">{error}</p>
@@ -267,22 +192,6 @@ export const MapboxPicker: React.FC<MapboxPickerProps> = ({ onLocationChange, di
         className="relative w-full bg-muted"
         aria-label="Seleccionar ubicación en mapa"
       />
-      {showManualSelection && hasMarker && (
-        <div className="flex justify-end mt-2">
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => {
-              const pos = markerRef.current?.getLngLat();
-              if (pos) {
-                callbackRef.current?.(pos.lat, pos.lng);
-              }
-            }}
-          >
-            <Check className="h-4 w-4 mr-2" /> Confirmar ubicación
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
