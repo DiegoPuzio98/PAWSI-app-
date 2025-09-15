@@ -27,6 +27,7 @@ import Saved from "./pages/Saved";
 import Messages from "./pages/Messages";
 import Terms from "./pages/Terms";
 import AdminPanel from "./pages/AdminPanel";
+import ResetPassword from "./pages/ResetPassword";
 import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<AuthGuard requireAuth={false}><AuthPage /></AuthGuard>} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/dashboard" element={<AuthGuard requireAuth={true}><Dashboard /></AuthGuard>} />
                   <Route path="/profile" element={<AuthGuard requireAuth={true}><Profile /></AuthGuard>} />
                   <Route path="/reported" element={<ReportedPets />} />
