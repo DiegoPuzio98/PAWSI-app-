@@ -71,7 +71,7 @@ export const NewsStrip = () => {
           .order('created_at', { ascending: false })
           .limit(8);
 
-        // Filter strictly by user's province if available
+        // Filter by user's province if available, otherwise show general content
         if (userProfile?.province) {
           lostQuery = lostQuery.eq('province', userProfile.province);
           reportedQuery = reportedQuery.eq('province', userProfile.province);

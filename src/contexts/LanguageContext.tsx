@@ -71,6 +71,10 @@ const translations = {
     'species.birds': 'Aves',
     'species.rodents': 'Roedores',
     'species.fish': 'Peces',
+    'species.dog': 'Perro',
+    'species.cat': 'Gato',
+    'species.bird': 'Ave',
+    'species.rodent': 'Roedor',
     
     // Status
     'status.lost': 'Perdida',
@@ -158,6 +162,10 @@ const translations = {
     'species.birds': 'Birds',
     'species.rodents': 'Rodents',
     'species.fish': 'Fish',
+    'species.dog': 'Dog',
+    'species.cat': 'Cat',
+    'species.bird': 'Bird',
+    'species.rodent': 'Rodent',
     
     // Status
     'status.lost': 'Lost',
@@ -245,6 +253,10 @@ const translations = {
     'species.birds': 'Aves',
     'species.rodents': 'Roedores',
     'species.fish': 'Peixes',
+    'species.dog': 'Cão',
+    'species.cat': 'Gato',
+    'species.bird': 'Ave',
+    'species.rodent': 'Roedor',
 
     // Status
     'status.lost': 'Perdido',

@@ -13,9 +13,11 @@ import { Mail, Lock, User, AlertCircle, MapPin } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
@@ -78,6 +80,39 @@ export default function AuthPage() {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    if (!email) {
+      setError('Ingresa tu email para recuperar tu contraseña');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const redirectUrl = `${window.location.origin}/auth`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl
+      });
+
+      if (error) {
+        setError(error.message);
+      } else {
+        toast({
+          title: 'Email enviado',
+          description: 'Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada.'
+        });
+        setShowForgotPassword(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Ocurrió un error inesperado');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -89,17 +124,27 @@ export default function AuthPage() {
               <PawIcon size={48} />
             </div>
             <h1 className="text-2xl font-bold text-primary mb-2">
-              {isSignUp ? t('auth.signUp') : t('auth.signIn')}
+              {showForgotPassword ? 'Recuperar contraseña' : isSignUp ? t('auth.signUp') : t('auth.signIn')}
             </h1>
             <p className="text-muted-foreground">
-              {isSignUp ? 'Crea tu cuenta para gestionar tus publicaciones' : t('auth.subtitle')}
+              {showForgotPassword 
+                ? 'Ingresa tu email para recibir un enlace de recuperación'
+                : isSignUp 
+                ? 'Crea tu cuenta para gestionar tus publicaciones' 
+                : t('auth.subtitle')
+              }
             </p>
           </div>
 
           <Card>
             <CardHeader>
               <CardTitle>
-                {isSignUp ? 'Crear Cuenta' : 'Iniciar Sesión'}
+                {showForgotPassword 
+                  ? 'Recuperar Contraseña'
+                  : isSignUp 
+                  ? 'Crear Cuenta' 
+                  : 'Iniciar Sesión'
+                }
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -112,8 +157,8 @@ export default function AuthPage() {
                 </Alert>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {isSignUp && (
+              <form onSubmit={showForgotPassword ? handleForgotPassword : handleSubmit} className="space-y-4">
+                {!showForgotPassword && isSignUp && (
                   <div>
                     <label className="block text-sm font-medium mb-1">
                       Nombre para mostrar
@@ -133,7 +178,7 @@ export default function AuthPage() {
                   </div>
                 )}
 
-                {isSignUp && (
+                {!showForgotPassword && isSignUp && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-2">
                       <MapPin className="h-4 w-4 inline mr-1" />
@@ -170,26 +215,28 @@ export default function AuthPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">
-                    {t('auth.password')}
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                    <Input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="pl-10"
-                      required
-                      disabled={loading}
-                      minLength={6}
-                    />
+                {!showForgotPassword && (
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      {t('auth.password')}
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                      <Input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="pl-10"
+                        required
+                        disabled={loading}
+                        minLength={6}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {isSignUp && (
+                {!showForgotPassword && isSignUp && (
                   <div className="flex items-start gap-2 text-sm mb-2">
                     <Checkbox
                       id="terms"
@@ -218,30 +265,74 @@ export default function AuthPage() {
                   disabled={loading}
                 >
                   {loading 
-                    ? (isSignUp ? t('auth.creatingAccount') : t('auth.signingIn'))
-                    : (isSignUp ? t('auth.signUp') : t('auth.signIn'))
+                    ? (showForgotPassword 
+                        ? 'Enviando...' 
+                        : isSignUp 
+                        ? t('auth.creatingAccount') 
+                        : t('auth.signingIn')
+                      )
+                    : (showForgotPassword 
+                        ? 'Enviar enlace de recuperación'
+                        : isSignUp 
+                        ? t('auth.signUp') 
+                        : t('auth.signIn')
+                      )
                   }
                 </Button>
               </form>
 
-              <div className="mt-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
-                  {' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsSignUp(!isSignUp);
-                      setError(null);
-                      setCountry("");
-                      setProvince("");
-                    }}
-                    className="text-primary hover:underline font-medium"
-                    disabled={loading}
-                  >
-                    {isSignUp ? 'Iniciar sesión' : 'Crear cuenta'}
-                  </button>
-                </p>
+              <div className="mt-6 text-center space-y-4">
+                {!showForgotPassword && (
+                  <p className="text-sm text-muted-foreground">
+                    {isSignUp ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
+                    {' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSignUp(!isSignUp);
+                        setError(null);
+                        setCountry("");
+                        setProvince("");
+                      }}
+                      className="text-primary hover:underline font-medium"
+                      disabled={loading}
+                    >
+                      {isSignUp ? 'Iniciar sesión' : 'Crear cuenta'}
+                    </button>
+                  </p>
+                )}
+
+                {!showForgotPassword && !isSignUp && (
+                  <p className="text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(true);
+                        setError(null);
+                      }}
+                      className="text-primary hover:underline font-medium"
+                      disabled={loading}
+                    >
+                      ¿Olvidaste tu contraseña? Recupérala
+                    </button>
+                  </p>
+                )}
+
+                {showForgotPassword && (
+                  <p className="text-sm text-muted-foreground">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowForgotPassword(false);
+                        setError(null);
+                      }}
+                      className="text-primary hover:underline font-medium"
+                      disabled={loading}
+                    >
+                      Volver al inicio de sesión
+                    </button>
+                  </p>
+                )}
               </div>
 
               <div className="mt-4 text-center">

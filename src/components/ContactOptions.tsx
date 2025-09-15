@@ -55,7 +55,10 @@ export function ContactOptions({ contactInfo, postId, postType, recipientId, pos
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => window.open(`https://wa.me/${contactInfo.contact_whatsapp}`, '_blank')}
+                onClick={() => {
+                  const sanitizedPhone = contactInfo.contact_whatsapp?.replace(/\D/g, '') || '';
+                  window.open(`https://wa.me/${sanitizedPhone}`, '_blank');
+                }}
               >
                 <MessageSquare className="h-4 w-4 mr-2" />
                 WhatsApp
