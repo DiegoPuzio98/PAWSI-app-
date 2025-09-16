@@ -1,0 +1,10 @@
+# This is a placeholder for the app icon. 
+# Replace this with your actual app icon files in different resolutions:
+# - mipmap-mdpi (48x48)
+# - mipmap-hdpi (72x72) 
+# - mipmap-xhdpi (96x96)
+# - mipmap-xxhdpi (144x144)
+# - mipmap-xxxhdpi (192x192)
+# 
+# You can generate these from your source icon using Android Studio
+# or online tools like https://romannurik.github.io/AndroidAssetStudio/

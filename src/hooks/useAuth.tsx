@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useNativeAuth } from "./useNativeAuth";
 
 interface AuthContextType {
   user: User | null;
@@ -8,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   signUp: (email: string, password: string, displayName?: string, locationData?: { country?: string; province?: string }) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ data: any; error: any }>;
   signOut: () => Promise<void>;
   loading: boolean;
 }
@@ -18,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { signInWithGoogle: nativeSignInWithGoogle } = useNativeAuth();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -65,6 +68,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return { error };
   };
 
+  const signInWithGoogle = async () => {
+    return await nativeSignInWithGoogle();
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -77,6 +84,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isAuthenticated: !!user,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         loading,
       }}
