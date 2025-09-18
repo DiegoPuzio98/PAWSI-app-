@@ -17,6 +17,7 @@ interface LostPost {
   title: string;
   species: string;
   breed: string;
+  sex?: string;
   colors: string[];
   description: string;
   location_text: string;
@@ -37,6 +38,7 @@ export default function LostPets() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [speciesFilter, setSpeciesFilter] = useState("all");
+  const [sexFilter, setSexFilter] = useState("");
   const [colorFilters, setColorFilters] = useState<string[]>([]);
   const [locationFilter, setLocationFilter] = useState("");
   const [userProfile, setUserProfile] = useState<{country?: string, province?: string} | null>(null);
@@ -56,6 +58,7 @@ export default function LostPets() {
   const handleResetFilters = () => {
     setSearchTerm("");
     setSpeciesFilter("all");
+    setSexFilter("");
     setColorFilters([]);
     setLocationFilter("");
   };
@@ -83,7 +86,7 @@ export default function LostPets() {
 
   useEffect(() => {
     fetchPosts();
-  }, [searchTerm, speciesFilter, colorFilters, locationFilter, userProfile]);
+  }, [searchTerm, speciesFilter, sexFilter, colorFilters, locationFilter, userProfile]);
 
   const fetchPosts = async () => {
     let query = supabase
@@ -107,6 +110,10 @@ export default function LostPets() {
 
     if (locationFilter) {
       query = query.ilike('location_text', `%${locationFilter}%`);
+    }
+
+    if (sexFilter) {
+      query = query.eq('sex', sexFilter);
     }
 
     const { data, error } = await query;
@@ -156,6 +163,8 @@ export default function LostPets() {
           onSearchTermChange={setSearchTerm}
           speciesFilter={speciesFilter}
           onSpeciesFilterChange={setSpeciesFilter}
+          sexFilter={sexFilter}
+          onSexFilterChange={setSexFilter}
           colorFilters={colorFilters}
           onColorFiltersChange={setColorFilters}
           locationFilter={locationFilter}
@@ -194,9 +203,14 @@ export default function LostPets() {
                   </div>
                 </div>
                 
-                {post.breed && (
-                  <p className="text-sm text-muted-foreground mb-2">{post.breed}</p>
-                )}
+                <div className="flex gap-2 mb-2">
+                  {post.breed && (
+                    <span className="text-sm text-muted-foreground">Raza: {post.breed}</span>
+                  )}
+                  {post.sex && (
+                    <span className="text-sm text-muted-foreground">Sexo: {post.sex}</span>
+                  )}
+                </div>
 
                 {post.colors && post.colors.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-2">

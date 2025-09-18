@@ -32,6 +32,7 @@ export type Database = {
           location_text: string | null
           owner_secret_hash: string
           province: string | null
+          sex: string | null
           species: string | null
           status: string
           title: string
@@ -55,6 +56,7 @@ export type Database = {
           location_text?: string | null
           owner_secret_hash: string
           province?: string | null
+          sex?: string | null
           species?: string | null
           status?: string
           title: string
@@ -78,6 +80,7 @@ export type Database = {
           location_text?: string | null
           owner_secret_hash?: string
           province?: string | null
+          sex?: string | null
           species?: string | null
           status?: string
           title?: string
@@ -195,6 +198,7 @@ export type Database = {
           lost_at: string | null
           owner_secret_hash: string
           province: string | null
+          sex: string | null
           species: string | null
           status: string
           title: string
@@ -218,6 +222,7 @@ export type Database = {
           lost_at?: string | null
           owner_secret_hash: string
           province?: string | null
+          sex?: string | null
           species?: string | null
           status?: string
           title: string
@@ -241,6 +246,7 @@ export type Database = {
           lost_at?: string | null
           owner_secret_hash?: string
           province?: string | null
+          sex?: string | null
           species?: string | null
           status?: string
           title?: string
@@ -411,6 +417,7 @@ export type Database = {
           owner_secret_hash: string | null
           province: string | null
           seen_at: string | null
+          sex: string | null
           species: string | null
           state: string
           status: string
@@ -435,6 +442,7 @@ export type Database = {
           owner_secret_hash?: string | null
           province?: string | null
           seen_at?: string | null
+          sex?: string | null
           species?: string | null
           state: string
           status?: string
@@ -459,6 +467,7 @@ export type Database = {
           owner_secret_hash?: string | null
           province?: string | null
           seen_at?: string | null
+          sex?: string | null
           species?: string | null
           state?: string
           status?: string

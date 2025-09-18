@@ -22,6 +22,9 @@ interface AdvancedSearchProps {
   // Optional breed filter support
   breedFilter?: string;
   onBreedFilterChange?: (breed: string) => void;
+  // Optional sex filter support
+  sexFilter?: string;
+  onSexFilterChange?: (sex: string) => void;
   onReset: () => void;
 }
 
@@ -37,6 +40,9 @@ export function AdvancedSearch({
   // optional breed filter
   breedFilter,
   onBreedFilterChange,
+  // optional sex filter
+  sexFilter,
+  onSexFilterChange,
   onReset
 }: AdvancedSearchProps) {
   const { t } = useLanguage();
@@ -54,7 +60,7 @@ export function AdvancedSearch({
     onColorFiltersChange(colorFilters.filter(c => c !== color));
   };
 
-  const hasActiveFilters = speciesFilter !== "all" || !!breedFilter || colorFilters.length > 0 || !!locationFilter;
+  const hasActiveFilters = speciesFilter !== "all" || !!breedFilter || !!sexFilter || colorFilters.length > 0 || !!locationFilter;
 
   return (
     <div className="space-y-4">
@@ -123,6 +129,24 @@ export function AdvancedSearch({
                 </div>
               )}
 
+              {/* Optional Sex filter */}
+              {onSexFilterChange && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">Sexo</label>
+                  <Select value={sexFilter || "all"} onValueChange={(value) => onSexFilterChange(value === "all" ? "" : value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos los sexos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los sexos</SelectItem>
+                      <SelectItem value="macho">Macho</SelectItem>
+                      <SelectItem value="hembra">Hembra</SelectItem>
+                      <SelectItem value="no sé">No sé</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               {/* Location filter */}
               <div>
                 <label className="block text-sm font-medium mb-2">Ubicación</label>
@@ -173,6 +197,15 @@ export function AdvancedSearch({
               <X 
                 className="h-3 w-3 ml-1 cursor-pointer" 
                 onClick={() => onBreedFilterChange("")}
+              />
+            </Badge>
+          )}
+          {sexFilter && onSexFilterChange && (
+            <Badge variant="secondary" className="text-xs">
+              ⚥ {sexFilter}
+              <X 
+                className="h-3 w-3 ml-1 cursor-pointer" 
+                onClick={() => onSexFilterChange("")}
               />
             </Badge>
           )}

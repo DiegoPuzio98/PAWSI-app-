@@ -29,6 +29,7 @@ export default function AdoptionsNew() {
   const [title, setTitle] = useState("");
   const [species, setSpecies] = useState<string>("");
   const [breed, setBreed] = useState("");
+  const [sex, setSex] = useState("");
   const [age, setAge] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -105,6 +106,7 @@ export default function AdoptionsNew() {
         title,
         species: normalizedSpecies || null,
         breed: breed || null,
+        sex: sex || null,
         age: age || null,
         description: description || null,
         location_text: location || null,
@@ -181,6 +183,19 @@ export default function AdoptionsNew() {
                 onProvinceChange={setProvince}
                 disabled={submitting}
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Sexo (opcional)</label>
+              <Select value={sex} onValueChange={setSex}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar sexo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="macho">Macho</SelectItem>
+                  <SelectItem value="hembra">Hembra</SelectItem>
+                  <SelectItem value="no sé">No sé</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
