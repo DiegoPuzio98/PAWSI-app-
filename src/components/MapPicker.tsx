@@ -91,6 +91,7 @@ export const MapPicker: React.FC<MapPickerProps> = ({ onLocationChange, disabled
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
       setLoading(true);
+      setError(null);
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const lat = position.coords.latitude;
@@ -102,8 +103,25 @@ export const MapPicker: React.FC<MapPickerProps> = ({ onLocationChange, disabled
         },
         (error) => {
           console.error("Geolocation error:", error);
-          setError("No se pudo obtener la ubicación actual");
+          let errorMessage = "No se pudo obtener la ubicación actual";
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Se negó el acceso a la ubicación. Por favor, permite el acceso en la configuración del navegador.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "La ubicación no está disponible en este momento.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Tiempo de espera agotado para obtener la ubicación.";
+              break;
+          }
+          setError(errorMessage);
           setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
         }
       );
     } else {
